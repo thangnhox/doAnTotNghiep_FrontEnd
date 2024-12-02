@@ -1,14 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import queryString from "query-string";
-import { AppConstants } from "../appConstants";
+import store from "../redux/reduxStore";
 
 const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:3000";
 
 export const getAccessToken = () => {
-  let token: string = localStorage.getItem(AppConstants.token) ?? "";
-  if (token && token.length > 0) {
-    token = JSON.parse(token).token;
-  }
+  let token = store.getState().auth.data.token;
   return token;
 };
 
