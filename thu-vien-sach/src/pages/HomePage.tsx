@@ -4,46 +4,114 @@ import { ResponseDTO } from '../dtos/ResponseDTO';
 import Book from '../models/book/Book';
 import { AxiosResponse } from 'axios';
 import BookCard from '../components/books/BookCard';
-import { message, Typography } from 'antd';
+import { Card, Carousel, Divider, Image, message, Spin, Typography } from 'antd';
 import { Link } from 'react-router-dom';
+import Category from '../models/Category';
+import Author from '../models/Author';
 
 const HomePage = () => {
 
   const [isLoading, setLoading] = useState<boolean>(false);
   const [pageNum, setPageNum] = useState<number>(1);
   const [books, setBooks] = useState<Book[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [authors, setAuthors] = useState<Author[]>([])
 
-  useEffect(()=>{
-    getBooks(pageNum)
-  },[pageNum])
+  useEffect(() => {
+    getData()
+  }, [pageNum])
 
-  const getBooks = async ( page: number ) => {
+  const getBooks = async (page: number) => {
+    const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`books?page=${page}&pageSize=10&sort=IsRecommended&order=desc`)
+    setBooks(res.data.data)
+
+  }
+
+  const getCategories = async (page: number) => {
+    const res: AxiosResponse<ResponseDTO<Category[]>> = await handleAPI(`categories?page${page}&pageSize=10&isRecommended=1`)
+    setCategories(res.data.data)
+  }
+
+  const getAuthors = async (page: number) => {
+    const res: AxiosResponse<ResponseDTO<Author[]>> = await handleAPI(`authors?page${page}&pageSize=10`)
+    setAuthors(res.data.data)
+  }
+
+  const getData = async () => {
     setLoading(true)
     try {
-    const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`books?page=${page}&pageSize=10&sort=Title&order=desc`)
-    setBooks(res.data.data)
+      getBooks(pageNum)
+      getCategories(pageNum)
+      getAuthors(pageNum)
     } catch (error: any) {
       console.log(error)
       message.error(error.response.message)
-    }finally{
+    } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="d-flex flex-column gap-3">
-     <div className="d-flex flex-row justify-content-between align-items-center ">
-     <Typography.Title className='d-inline mb-0' >Nên đọc</Typography.Title>
-     <Link to={'books'} >Xem thêm</Link>
-     </div>
-      <div className="d-flex flex-row gap-3">
-        {books.map((book) => <BookCard book={book} key={book.BookID} />)}
+    isLoading ? <Spin /> : <div className="d-flex flex-column w-100 align-items-center overflow-y ">
+      <div className="d-flex flex-column w-75 gap-4" >
+          <Carousel autoplay autoplaySpeed={5000} >
+          <Image src='../images/banner1.png' sizes='100%' preview={false} />
+          <Image src='../images/banner2.png' sizes='100%' preview={false} />
+          <Image src='../images/banner3.png' sizes='100%' preview={false} />
+          <Image src='../images/banner4.png' sizes='100%' preview={false} />
+          </Carousel>
+        <div className="d-flex flex-row justify-content-between align-items-center">
+          <Typography.Title level={3} className="mb-0">
+            Nên đọc
+          </Typography.Title>
+          <Link to="books" className="text-primary">
+            Xem thêm
+          </Link>
+        </div>
+        <div className="d-flex flex-row flex-wrap gap-3">
+          {books.map((book) => (
+            <BookCard book={book} key={book.BookID} />
+          ))}
+        </div>
+
+        <Divider />
+
+        <div className="d-flex flex-row justify-content-between align-items-center">
+          <Typography.Title level={3} className="mb-0">
+            Thể loại
+          </Typography.Title>
+          <Link to="categories" className="text-primary">
+            Xem thêm
+          </Link>
+        </div>
+        <div className="d-flex flex-row flex-wrap gap-3">
+          {categories.map((cat) => (
+            <Card onClick={()=> {console.log(cat.id)}} key={cat.id} hoverable >
+              {cat.name}
+            </Card>
+          ))}
+        </div>
+
+        <Divider />
+
+        <div className="d-flex flex-row justify-content-between align-items-center">
+          <Typography.Title level={3} className="mb-0">
+            Tác giả
+          </Typography.Title>
+          <Link to="authors" className="text-primary">
+            Xem thêm
+          </Link>
+        </div>
+        <div className="d-flex flex-row flex-wrap gap-3">
+          {authors.map((author) => (
+             <Card onClick={()=> {console.log(author.id)}} key={author.id} hoverable >
+             {author.name}
+           </Card>
+          ))}
+        </div>
       </div>
-      <div className="d-flex flex-row justify-content-between align-items-center ">
-      <Typography.Title className='d-inline mb-0' >Tác giả</Typography.Title>
-      <Link to={'authors'} >Xem thêm</Link>
-      </div>
-      </div>
+    </div>
+
   )
 }
 
