@@ -1,14 +1,19 @@
-import { Button, Card, Checkbox, Form, Input, message, Spin } from 'antd'
+import { Button, Card, Checkbox, Divider, Form, Input, message, Typography } from 'antd'
 import { useForm } from 'antd/es/form/Form'
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AppConstants } from '../../appConstants';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { ResponseDTO } from '../../dtos/ResponseDTO';
 import Token from '../../models/Token';
 import { handleAPI } from '../../remotes/apiHandle';
 import { useDispatch } from 'react-redux';
-import { addAuth } from '../../redux/authSlice';
+import { AddAuth } from '../../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { GoogleOutlined } from '@ant-design/icons';
+import { getRedirectResult, GoogleAuthProvider, signInWithPopup, signInWithRedirect, UserCredential } from 'firebase/auth';
+import { firebaseAuth, authProvider } from '../../firebase/firebaseConfig';
+import { FirebaseError } from 'firebase/app';
+import User from '../../models/User';
 
 const LoginForm = () => {
 
@@ -17,6 +22,8 @@ const LoginForm = () => {
   const [isRememberMe, setRememberMe] = useState<boolean>(false)
   const dispatch = useDispatch()
   const navigator = useNavigate()
+  const {Text} = Typography
+
 
   const login = async () => {
     const email: string  = loginForm.getFieldValue('email');
@@ -29,7 +36,13 @@ const LoginForm = () => {
       }
       const res: AxiosResponse<ResponseDTO<Token>> = await handleAPI(`user/login`, req , 'post');
       if(res.status === 200){
-        dispatch(addAuth({token: res.data.data}))
+        const token = res.data.data;
+        const userRes: AxiosResponse<ResponseDTO<User>> = await axios.get(`${process.env.REACT_APP_BASE_URL}/user/info`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        dispatch(AddAuth({token: token, user: userRes.data.data}))
         if(isRememberMe){
           localStorage.setItem(AppConstants.token, JSON.stringify(res.data.data))
         }
@@ -37,8 +50,39 @@ const LoginForm = () => {
         message.success('Đăng nhập thành công')
       }
     } catch (error:any) {
-      message.error(error.response.message)
+      message.error('Email hoặc mật khẩu không đúng')
       console.log(error)
+    }finally{
+      setLoading(false)
+    }
+  }
+
+  const signInWithGoogle = async() => {
+    try{
+      const result = await signInWithPopup(firebaseAuth, authProvider);
+      if(!result){
+        return;
+      }
+      const user = result.user.toJSON();
+      const res: AxiosResponse<ResponseDTO<Token>> = await handleAPI(`user/google`, user, 'post');
+      if(res.status === 200){
+        const token = res.data.data;
+        const userRes: AxiosResponse<ResponseDTO<User>> = await axios.get(`${process.env.REACT_APP_BASE_URL}/user/info`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        console.log(token)
+        localStorage.setItem(AppConstants.token,JSON.stringify({token: token}))
+        dispatch(AddAuth({token: token, user: userRes.data.data}))
+        if(isRememberMe){
+          localStorage.setItem(AppConstants.token, JSON.stringify(res.data.data))
+        }
+        navigator('/',{replace: true});
+        message.success('Đăng nhập thành công')
+      }
+    }catch(e: any){
+      console.log(e)
     }finally{
       setLoading(false)
     }
@@ -83,6 +127,11 @@ const LoginForm = () => {
         </Form.Item>
         <Button type='primary' onClick={()=> loginForm.submit()} loading={isLoading} >Đăng nhập </Button>
       </Form>
+      <Divider/>
+      <Button onClick={signInWithGoogle} disabled={isLoading} >
+        <Text>Đăng nhập bằng google</Text>
+        <GoogleOutlined/>
+       </Button>
     </Card>
   )
 }
