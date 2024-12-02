@@ -7,7 +7,3 @@ export const validateToken = (token?: string): boolean => {
   return false;
 };
 
-
-export const getUserEmail = (token: string) => {
-  const enc_token = decodeToken(token);
-}
