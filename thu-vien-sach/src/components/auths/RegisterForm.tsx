@@ -1,9 +1,7 @@
 import { Button, Card, DatePicker, DatePickerProps, Form, Input, message, Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form'
 import { AxiosResponse } from 'axios';
-import React, { useState } from 'react'
-import { ResponseDTO } from '../../dtos/ResponseDTO';
-import Token from '../../models/Token';
+import { useState } from 'react'
 import { handleAPI } from '../../remotes/apiHandle';
 import { useNavigate } from 'react-router-dom';
 
@@ -46,7 +44,7 @@ const RegisterForm = () => {
       }
     } catch (error:any) {
       console.log(error)
-      message.error(error.message)
+      message.error(error.response?.data)
     }finally{
       setLoading(false)
     }
@@ -56,6 +54,7 @@ const RegisterForm = () => {
   const onChange: DatePickerProps['onChange'] = (date, dateString) => {
     setBirthYear(date.year())
   };
+
 
   return (
     <>
