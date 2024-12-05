@@ -1,98 +1,118 @@
-import { Button, Card, Descriptions, DescriptionsProps, Divider, Image, message, Spin, Tooltip, Typography } from 'antd'
-import React, { useEffect, useState } from 'react'
-import { redirect, useNavigate, useParams } from 'react-router-dom'
-import Book from '../../models/book/Book';
-import { ResponseDTO } from '../../dtos/ResponseDTO';
-import { handleAPI } from '../../remotes/apiHandle';
-import { AxiosResponse } from 'axios';
-import DescriptionTextIconComponent from '../../components/DescriptionTextIconComponent';
-import { reFormatToDDMMYY } from '../../utils/datetimeUtil';
-import { BookOutlined, LikeOutlined, ReadOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
-import { authState } from '../../redux/authSlice';
+import {
+  Button,
+  Card,
+  Descriptions,
+  DescriptionsProps,
+  Image,
+  message,
+  Spin,
+  Typography,
+} from "antd";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Book from "../../models/book/Book";
+import { ResponseDTO } from "../../dtos/ResponseDTO";
+import { handleAPI } from "../../remotes/apiHandle";
+import { AxiosResponse } from "axios";
+import { reFormatToDDMMYY } from "../../utils/datetimeUtil";
+import { useDispatch, useSelector } from "react-redux";
+import { authState } from "../../redux/authSlice";
+import { AddBookToCart } from "../../redux/cartSlice";
 
 const BookDetailPage = () => {
-
   const { bookId } = useParams();
   const [isLoading, setLoading] = useState<boolean>(false);
   const auth = useSelector(authState);
   const [book, setBook] = useState<Book>();
   const navigate = useNavigate();
-  const descriptionItems: DescriptionsProps['items'] = [
+  const dispatch = useDispatch();
+
+  const descriptionItems: DescriptionsProps["items"] = [
     {
-      key: 'pageCount',
-      label: 'Số trang',
+      key: "pageCount",
+      label: "Số trang",
       children: `${book?.PageCount}`,
-      span: 'filled'
+      span: "filled",
     },
     {
-      key: 'likes',
-      label: 'Số lượt thích',
+      key: "likes",
+      label: "Số lượt thích",
       children: `${book?.LikesCount}`,
-      span: 'filled'
+      span: "filled",
     },
     {
-      key: 'price',
-      label: 'Giá',
+      key: "price",
+      label: "Giá",
       children: `${book?.Price} VND`,
-      span: 'filled'
+      span: "filled",
     },
     {
-      key: 'Description',
-      label: 'Thể loại',
+      key: "Description",
+      label: "Thể loại",
       children: book?.Categories,
-      span: 'filled'
+      span: "filled",
     },
     {
-      key: 'publishedDate',
-      label: 'Ngày xuất bản',
+      key: "publishedDate",
+      label: "Ngày xuất bản",
       children: reFormatToDDMMYY(book?.PublishDate),
-      span: 'filled'
+      span: "filled",
     },
     {
-      key: 'publisherName',
-      label: 'Nhà xuất bản',
+      key: "publisherName",
+      label: "Nhà xuất bản",
       children: book?.PublisherName,
-      span: 'filled'
+      span: "filled",
     },
     {
-      key: 'description',
-      label: 'Mô tả',
+      key: "description",
+      label: "Mô tả",
       children: book?.Description,
-      span: 'filled'
+      span: "filled",
     },
-  ]
-  const { Link, Text } = Typography
+  ];
+  const { Link, Text } = Typography;
 
   useEffect(() => {
-    getBook()
-  }, [])
+    getBook();
+  }, []);
 
   const getBook = async () => {
     try {
-      setLoading(true)
-      const res: AxiosResponse<ResponseDTO<Book>> = await handleAPI(`/books/fetch/${bookId}`);
-      setBook(res.data.data)
-      console.log(book)
+      setLoading(true);
+      const res: AxiosResponse<ResponseDTO<Book>> = await handleAPI(
+        `/books/fetch/${bookId}`
+      );
+      setBook(res.data.data);
     } catch (error: any) {
       message.error(error);
-      console.log(error)
+      console.log(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handelUserRead = () => {
-    if(!auth.token){
+    if (!auth.token) {
       navigate("/login");
       return;
     }
     // navigate(`read`)
-  }
+  };
 
-  return isLoading ? <Spin /> : (
+  const handleBuy = () => {
+    if (!auth.token) {
+      navigate("/login");
+      return;
+    }
+    dispatch(AddBookToCart(book!));
+  };
+
+  return isLoading ? (
+    <Spin />
+  ) : (
     <div className="d-flex flex-column justify-content-center w-100 align-items-center">
-      <Card title={book?.Title} style={{ textAlign: 'start' }} className='w-50' >
+      <Card title={book?.Title} style={{ textAlign: "start" }} className="w-50">
         <div className="d-flex flex-column justify-content-center align-items-center gap-3">
           <Image
             src={book?.cover_url}
@@ -101,30 +121,23 @@ const BookDetailPage = () => {
             alt="Cover Book Image"
             className="rounded shadow-sm"
           />
-          <Text>Tác giả: <Link>{book?.AuthorName}</Link></Text>
+          <Text>
+            Tác giả: <Link>{book?.AuthorName}</Link>
+          </Text>
           <Text>Ngày phát hành: {reFormatToDDMMYY(book?.PublishDate)}</Text>
         </div>
         <div className="d-flex justify-content-center align-items-center m-3 gap-3">
-          <Button
-            type='primary'
-            size="large"
-          onClick={handelUserRead}
-          >
+          <Button type="primary" size="large" onClick={handelUserRead}>
             Đọc
           </Button>
-          <Button
-            type='primary'
-            size="large"
-          // onClick={() => navigate("read")}
-          >
+          <Button type="primary" size="large" onClick={handleBuy}>
             Mua {`${book?.Price} VND`}
           </Button>
         </div>
         <Descriptions items={descriptionItems} bordered />
       </Card>
     </div>
-  )
+  );
+};
 
-}
-
-export default BookDetailPage
+export default BookDetailPage;
