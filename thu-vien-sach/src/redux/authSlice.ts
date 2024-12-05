@@ -1,40 +1,38 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit";
 import { AppConstants } from "../appConstants";
 import { RootState } from "./reduxStore";
 import User from "../models/User";
 
-
 export interface AuthState {
-    token: string,
-    user: User | null
+  token: string;
+  user: User | null;
 }
 
 const initialState: AuthState = {
-    token: '',
-    user: null
-}
+  token: "",
+  user: null,
+};
 
-export const authSlice = createSlice({
-    name:'auth',
-    initialState: {
-        data: initialState
+const authSlice = createSlice({
+  name: "auth",
+  initialState: {
+    data: initialState,
+  },
+  reducers: {
+    AddAuth: (state, action) => {
+      state.data = action.payload;
     },
-    reducers: {
-        AddAuth: (state, action) => {
-            state.data = action.payload;
-        },
-        RemoveAuth: (state) => {
-            state.data = initialState
-            syncAuthStateLocalStorage(state.data)
-        }
-    }
+    RemoveAuth: (state) => {
+      state.data = initialState;
+      syncAuthStateLocalStorage(state.data);
+    },
+  },
 });
 
-
 const syncAuthStateLocalStorage = (data: AuthState) => {
-    localStorage.setItem(AppConstants.token, JSON.stringify(data))
-}
+  localStorage.setItem(AppConstants.token, JSON.stringify(data));
+};
 
-export const {AddAuth, RemoveAuth} = authSlice.actions
+export const { AddAuth, RemoveAuth } = authSlice.actions;
 export const authReducer = authSlice.reducer;
-export const authState = (state: RootState) => state.auth.data
+export const authState = (state: RootState) => state.auth.data;
