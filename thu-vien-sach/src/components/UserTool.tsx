@@ -1,45 +1,87 @@
-import { Avatar, Button, Dropdown, DropDownProps, Menu, MenuProps, Typography } from 'antd'
-import React, { useEffect, useState } from 'react'
-import User from '../models/User'
-import { useDispatch, useSelector } from 'react-redux'
-import { authState, RemoveAuth } from '../redux/authSlice'
-import { NotificationOutlined, SmileOutlined, UserOutlined } from '@ant-design/icons'
-import { Link, useNavigate } from 'react-router-dom'
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dropdown,
+  MenuProps,
+  Popover,
+  Typography,
+} from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { authState, RemoveAuth } from "../redux/authSlice";
+import {
+  NotificationOutlined,
+  ShoppingCartOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
+import { cartState } from "../redux/cartSlice";
+import CartLayout from "./CartLayout";
 
 const UserTool = () => {
-  const { Text } = Typography
-  const user = useSelector(authState)
+  const { Text } = Typography;
+  const user = useSelector(authState);
   const dispatch = useDispatch();
-  const navigate = useNavigate()
-  const items: MenuProps['items'] = [
+  const navigate = useNavigate();
+  const cart = useSelector(cartState);
+  const items: MenuProps["items"] = [
     {
-      key: 'user-infomation',
-      label: <Link className='nav-item' to={'user/user-detail'}>Thông tin</Link>
+      key: "user-infomation",
+      label: (
+        <Link className="nav-item" to={"user/user-detail"}>
+          Thông tin
+        </Link>
+      ),
     },
     {
-      key: 'logout',
+      key: "logout",
       danger: true,
-      label: 'Đăng xuất',
-      onClick: () => handleLogout()
+      label: "Đăng xuất",
+      onClick: () => handleLogout(),
     },
   ];
 
   const handleLogout = () => {
-    dispatch(RemoveAuth())
-    navigate('/')
-  }
+    dispatch(RemoveAuth());
+    navigate("/");
+  };
 
-  return <div className="d-flex flex-row gap-3 justify-content-end align-items-center w-75">
-    <Dropdown menu={{ items }} >
-      { user.user?.avatar && user.user.avatar.length >0 ? <Avatar src={user?.user?.avatar} /> : <Avatar icon={<UserOutlined />}/>}
-    </Dropdown>
+  const renderCartContent = () => {
+    if (!cart.books.length) {
+      return <Text type="secondary">Giỏ hàng của bạn trống</Text>;
+    }
+    return <CartLayout cart={cart} />;
+  };
 
-    <div className="d-flex flex-column justify-content-center align-items-start" >
-      <Text>{user?.user?.name}</Text>
-      <Text>{user?.user?.email}</Text>
+  return (
+    <div className="d-flex flex-row justify-content-end align-items-center gap-4 mt-3">
+      <Dropdown menu={{ items }}>
+        {user?.user?.avatar ? (
+          <Avatar src={user.user.avatar} />
+        ) : (
+          <Avatar icon={<UserOutlined />} />
+        )}
+      </Dropdown>
+
+      <div className="d-flex flex-column text-start ">
+        <Text>
+          <strong>{user?.user?.name || "Guest"}</strong>
+        </Text>
+        <Text>{user?.user?.email || "guest@example.com"}</Text>
+      </div>
+
+      <Popover
+        trigger={"click"}
+        content={renderCartContent()}
+        placement="bottom"
+      >
+        <Badge count={cart.books.length}>
+          <Button shape="circle" icon={<ShoppingCartOutlined />} />
+        </Badge>
+      </Popover>
+      <Button shape="circle" icon={<NotificationOutlined />} />
     </div>
-    <Button shape='circle' icon={<NotificationOutlined />} />
-  </div>
-}
+  );
+};
 
-export default UserTool
+export default UserTool;
