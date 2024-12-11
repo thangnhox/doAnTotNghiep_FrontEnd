@@ -1,8 +1,8 @@
-import { Button, Divider, Image, List, Typography } from "antd";
-import React from "react";
-import { CartState, RemoveBookFromCart } from "../redux/cartSlice";
-import { DeleteFilled } from "@ant-design/icons";
+import { Button, List, Typography } from "antd";
+import { CartState, ChangeOpenCloseCart } from "../redux/cartSlice";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import CartItem from "./CartItem";
 
 interface Props {
   cart: CartState;
@@ -10,40 +10,33 @@ interface Props {
 
 const CartLayout = (props: Props) => {
   const { cart } = props;
-  const { Text, Title } = Typography;
+  const { Text } = Typography;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const performPurchase = () => {};
+  const placeOrder = async () => {
+    dispatch(ChangeOpenCloseCart(false));
+    navigate(`/confirm-order`);
+  };
 
   return (
     <List
       itemLayout="horizontal"
       dataSource={cart.books}
       rowKey={(item) => item.BookID}
-      renderItem={(item) => (
-        <List.Item>
-          <div className="d-flex flex-row p-2 gap-3 justify-content-between align-items-center w-100">
-            <Image src={item.cover_url} preview={false} width={100} />
-            <div className="d-flex flex-column" style={{ flex: 1 }}>
-              <Title level={5}>{item.Title}</Title>
-              <Text type="secondary">{item.Price}</Text>
-            </div>
-            <Divider type="vertical" />
-            <Button
-              shape="circle"
-              icon={<DeleteFilled />}
-              onClick={() => dispatch(RemoveBookFromCart(item))}
-            />
-          </div>
-        </List.Item>
-      )}
+      renderItem={(item) => <CartItem book={item} />}
       footer={
         <div className="d-flex flex-column w-100 gap-3">
           <div className="d-flex flex-row p-2 justify-content-between align-items-center w-100">
             <Text>Tổng giá</Text>
             <Text>{cart.total} VND</Text>
           </div>
-          <Button onClick={performPurchase} type="primary">
+          <Button
+            onClick={() => {
+              placeOrder();
+            }}
+            type="primary"
+          >
             Thanh toán
           </Button>
         </div>

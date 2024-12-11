@@ -15,7 +15,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
-import { cartState } from "../redux/cartSlice";
+import { cartState, ChangeOpenCloseCart, ClearCart } from "../redux/cartSlice";
 import CartLayout from "./CartLayout";
 
 const UserTool = () => {
@@ -43,6 +43,7 @@ const UserTool = () => {
 
   const handleLogout = () => {
     dispatch(RemoveAuth());
+    dispatch(ClearCart());
     navigate("/");
   };
 
@@ -74,6 +75,8 @@ const UserTool = () => {
         trigger={"click"}
         content={renderCartContent()}
         placement="bottom"
+        open={cart.open}
+        onOpenChange={(val) => dispatch(ChangeOpenCloseCart(val))}
       >
         <Badge count={cart.books.length}>
           <Button shape="circle" icon={<ShoppingCartOutlined />} />

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AppConstants } from "../appConstants";
 import { RootState } from "./reduxStore";
 import User from "../models/User";
+import { ClearCart } from "./cartSlice";
 
 export interface AuthState {
   token: string;
