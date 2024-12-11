@@ -19,32 +19,31 @@ import Author from "../models/Author";
 
 const HomePage = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [pageNum, setPageNum] = useState<number>(1);
   const [books, setBooks] = useState<Book[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
 
   useEffect(() => {
     getData();
-  }, [pageNum]);
+  }, []);
 
-  const getBooks = async (page: number) => {
+  const getBooks = async () => {
     const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(
-      `books?page=${page}&pageSize=10&sort=IsRecommended&order=desc`
+      `books?page=1&pageSize=10&sort=IsRecommended&order=desc`
     );
     setBooks(res.data.data);
   };
 
-  const getCategories = async (page: number) => {
+  const getCategories = async () => {
     const res: AxiosResponse<ResponseDTO<Category[]>> = await handleAPI(
-      `categories?page${page}&pageSize=10&isRecommended=1`
+      `categories?page=1&pageSize=10&isRecommended=1`
     );
     setCategories(res.data.data);
   };
 
-  const getAuthors = async (page: number) => {
+  const getAuthors = async () => {
     const res: AxiosResponse<ResponseDTO<Author[]>> = await handleAPI(
-      `authors?page${page}&pageSize=10`
+      `authors?page=1&pageSize=10`
     );
     setAuthors(res.data.data);
   };
@@ -52,9 +51,9 @@ const HomePage = () => {
   const getData = async () => {
     setLoading(true);
     try {
-      getBooks(pageNum);
-      getCategories(pageNum);
-      getAuthors(pageNum);
+      getBooks();
+      getCategories();
+      getAuthors();
     } catch (error: any) {
       console.log(error);
       message.error(error.response.message);
