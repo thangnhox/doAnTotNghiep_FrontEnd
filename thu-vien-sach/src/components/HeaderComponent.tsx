@@ -1,4 +1,4 @@
-import { Button, Divider, Input, Menu } from "antd";
+import { Button, Divider, Image, Input, Menu } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { useEffect } from "react";
 import { AddAuth, authState, AuthState } from "../redux/authSlice";
@@ -16,41 +16,6 @@ const HeaderComponent = () => {
   const auth: AuthState = useSelector(authState);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const menuItems: ItemType<MenuItemType>[] = [
-    {
-      key: "home",
-      label: (
-        <Link className="nav-item" to={"/"}>
-          Trang chủ
-        </Link>
-      ),
-    },
-    {
-      key: "about",
-      label: (
-        <Link className="nav-item" to={"/"}>
-          Về chúng tôi
-        </Link>
-      ),
-    },
-    {
-      key: "vision",
-      label: (
-        <Link className="nav-item" to={"/"}>
-          Tầm nhìn
-        </Link>
-      ),
-    },
-    {
-      key: "contact-us",
-      label: (
-        <Link className="nav-item" to={"/"}>
-          Liên hệ
-        </Link>
-      ),
-    },
-  ];
 
   useEffect(() => {
     checkLogin();
@@ -81,13 +46,12 @@ const HeaderComponent = () => {
 
   return (
     <Header className="d-flex flex-row justify-content-between align-items-center bg-white shadow-sm rounded">
-      <Menu
-        items={menuItems}
-        mode="horizontal"
-        defaultSelectedKeys={["home"]}
-        style={{ flex: 1, marginRight: "2rem" }}
+      <Image
+        src="./images/logo.png"
+        width={60}
+        preview={false}
+        onClick={() => navigate("/")}
       />
-
       <div className="d-flex flex-row align-items-center gap-3">
         <Input.Search
           placeholder="Nhập tên sách cần tìm"
