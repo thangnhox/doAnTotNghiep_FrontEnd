@@ -18,6 +18,7 @@ import MyDictionary from "./MyDictionary";
 import RequestedBookList from "./RequestedBookList";
 import { Content } from "antd/es/layout/layout";
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
+import { reFormatToDDMMYY } from "../../utils/datetimeUtil";
 
 interface PageProp {
   user: User | null;
@@ -59,14 +60,9 @@ const UserInformationPage = (props: PageProp) => {
   const getMembershipInfo = async () => {
     try {
       setLoading(true);
-      const token = getAccessToken();
-      const res = await axios.get("membership/check", {
-        headers: {
-          Authorization: `Beare ${token}`,
-        },
-      });
+      const res = await handleAPI(`membership/check`);
       setMembership(res.data.data.membership);
-      setExpiredDate(res.data.data.expireDate);
+      setExpiredDate(reFormatToDDMMYY(res.data.data.expireDate));
     } catch (error: any) {
       console.log(error);
     }
@@ -104,6 +100,7 @@ const UserInformationPage = (props: PageProp) => {
                 avatarUrl={user?.avatar}
                 email={user?.email ?? "guest@example.com"}
                 fullName={user?.name ?? "Guest"}
+                birthYear={user?.birthYear ?? "N/a"}
               />
             </div>
             <div className="col">
