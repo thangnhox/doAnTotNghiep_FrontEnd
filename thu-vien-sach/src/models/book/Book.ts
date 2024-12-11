@@ -5,10 +5,7 @@ export default interface Book {
   file_url: string;
   cover_url: string;
   PageCount: number;
-  status: {
-    type: string;
-    data: number[];
-  };
+  status: number;
   Description: string;
   PublisherName: string;
   PublishDate: string;
