@@ -97,7 +97,7 @@ const BookDetailPage = () => {
       navigate("/login");
       return;
     }
-    // navigate(`read`)
+    navigate(`read`);
   };
 
   const handleBuy = () => {
