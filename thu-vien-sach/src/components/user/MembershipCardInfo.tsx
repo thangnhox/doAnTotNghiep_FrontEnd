@@ -1,23 +1,23 @@
-import React from "react";
-import Membership from "../../models/Membership";
 import { Button, Card, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
+import { UserMembership } from "../../models/UserMembership";
 
 interface Props {
-  membership: Membership | null;
-  expireDate: string;
+  membership: UserMembership | null;
 }
 
 const MembershipCardInfo = (prop: Props) => {
-  const { membership, expireDate } = prop;
+  const { membership } = prop;
   const { Title, Text } = Typography;
   const navigate = useNavigate();
 
   return (
     <Card>
-      <div className="d-flex flex-column gap-2">
-        <Title level={3}>{membership?.name ?? "Chưa đăng ký thành viên"}</Title>
-        <Text type="secondary">{expireDate}</Text>
+      <div className="d-flex flex-column gap-2 ">
+        <Title level={3}>
+          {membership?.membership.name ?? "Chưa đăng ký thành viên"}
+        </Title>
+        <Text type="secondary">{membership?.expireDate ?? "N/a"}</Text>
         {!membership && (
           <Button
             className="mt-2"

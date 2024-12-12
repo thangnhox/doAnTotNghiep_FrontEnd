@@ -22,6 +22,7 @@ import { GoogleOutlined } from "@ant-design/icons";
 import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, authProvider } from "../../firebase/firebaseConfig";
 import User from "../../models/User";
+import Membership from "../../models/Membership";
 
 const LoginForm = () => {
   const [loginForm] = useForm();
@@ -55,7 +56,23 @@ const LoginForm = () => {
             },
           }
         );
-        dispatch(AddAuth({ token: token, user: userRes.data.data }));
+        const membershipRes: AxiosResponse<ResponseDTO<Membership>> =
+          await axios.get(
+            `${process.env.REACT_APP_BASE_URL}/membership/check`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+        dispatch(
+          AddAuth({
+            token: token,
+            user: userRes.data.data,
+            membership: membershipRes.data.data ?? null,
+          })
+        );
+
         if (isRememberMe) {
           localStorage.setItem(
             AppConstants.token,

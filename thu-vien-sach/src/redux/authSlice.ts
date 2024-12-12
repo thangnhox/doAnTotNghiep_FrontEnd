@@ -3,15 +3,19 @@ import { AppConstants } from "../appConstants";
 import { RootState } from "./reduxStore";
 import User from "../models/User";
 import { ClearCart } from "./cartSlice";
+import Membership from "../models/Membership";
+import { UserMembership } from "../models/UserMembership";
 
 export interface AuthState {
   token: string;
   user: User | null;
+  membership: UserMembership | null;
 }
 
 const initialState: AuthState = {
   token: "",
   user: null,
+  membership: null,
 };
 
 const authSlice = createSlice({

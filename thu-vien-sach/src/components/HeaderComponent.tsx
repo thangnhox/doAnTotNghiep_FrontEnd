@@ -1,4 +1,4 @@
-import { Button, Divider, Image, Input, Menu } from "antd";
+import { Button, Divider, Image, Input } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { useEffect } from "react";
 import { AddAuth, authState, AuthState } from "../redux/authSlice";
@@ -6,11 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppConstants } from "../appConstants";
 import { validateToken } from "../utils/jwtUtil";
 import UserTool from "./UserTool";
-import { Link, useNavigate } from "react-router-dom";
-import { ItemType, MenuItemType } from "antd/es/menu/interface";
+import { useNavigate } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { ResponseDTO } from "../dtos/ResponseDTO";
 import { User } from "firebase/auth";
+import { UserMembership } from "../models/UserMembership";
 
 const HeaderComponent = () => {
   const auth: AuthState = useSelector(authState);
@@ -30,15 +30,30 @@ const HeaderComponent = () => {
       if (!validateToken(res)) {
         return;
       }
+
       const userRes: AxiosResponse<ResponseDTO<User>> = await axios.get(
         `${process.env.REACT_APP_BASE_URL}/user/info`,
         {
           headers: {
-            Authorization: `Bearer ${JSON.parse(res)}`,
+            Authorization: `Bearer ${JSON.parse(res).token}`,
           },
         }
       );
-      dispatch(AddAuth({ token: res, user: userRes.data.data }));
+
+      const membershipRes: AxiosResponse<ResponseDTO<UserMembership>> =
+        await axios.get(`${process.env.REACT_APP_BASE_URL}/membership/check`, {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(res).token}`,
+          },
+        });
+
+      dispatch(
+        AddAuth({
+          token: res,
+          user: userRes.data.data,
+          membership: membershipRes.data.data,
+        })
+      );
     } catch (e: any) {
       console.log(e);
     }
