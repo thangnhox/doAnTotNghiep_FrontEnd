@@ -1,15 +1,15 @@
-import './App.css';
-import MainRouter from './routes/MainRouter';
-import { ConfigProvider } from 'antd';
-import { Provider } from 'react-redux';
-import store from './redux/reduxStore';
+import "./App.css";
+import { ConfigProvider } from "antd";
+import { Provider } from "react-redux";
+import store from "./redux/reduxStore";
+import MainRouter from "./routes/MainRouter";
 
 function App() {
   return (
     <div className="App">
       <ConfigProvider>
         <Provider store={store}>
-        <MainRouter/>
+          <MainRouter />
         </Provider>
       </ConfigProvider>
     </div>
