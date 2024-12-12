@@ -1,8 +1,6 @@
 import { DeleteFilled } from "@ant-design/icons";
 import { Button, Divider, Image, List, Typography } from "antd";
-import React from "react";
 import { useDispatch } from "react-redux";
-import { authState } from "../redux/authSlice";
 import { RemoveBookFromCart } from "../redux/cartSlice";
 import Book from "../models/book/Book";
 

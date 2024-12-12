@@ -1,7 +1,7 @@
 export const AppConstants = {
-    token: 'token',
-    dateFormat: "YYYY-MM-DD",
-    regex: {
-        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    },
-}
+  token: "token",
+  dateFormat: "YYYY-MM-DD",
+  regex: {
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  },
+};
