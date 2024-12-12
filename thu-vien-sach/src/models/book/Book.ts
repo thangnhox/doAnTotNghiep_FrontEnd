@@ -6,6 +6,7 @@ export default interface Book {
   cover_url: string;
   PageCount: number;
   status: number;
+  rank: number;
   Description: string;
   PublisherName: string;
   PublishDate: string;
