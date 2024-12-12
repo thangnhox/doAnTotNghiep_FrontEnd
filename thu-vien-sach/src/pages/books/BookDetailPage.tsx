@@ -5,10 +5,11 @@ import {
   DescriptionsProps,
   Image,
   message,
+  Modal,
   Spin,
   Typography,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Book from "../../models/book/Book";
 import { ResponseDTO } from "../../dtos/ResponseDTO";
@@ -18,12 +19,20 @@ import { reFormatToDDMMYY } from "../../utils/datetimeUtil";
 import { useDispatch, useSelector } from "react-redux";
 import { authState } from "../../redux/authSlice";
 import { AddBookToCart } from "../../redux/cartSlice";
+import { isUserYearOldValidated } from "../../utils/userYearOldHandler";
 
 const BookDetailPage = () => {
   const { bookId } = useParams();
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    message: string;
+  }>({
+    isOpen: false,
+    message: "",
+  });
   const auth = useSelector(authState);
-  const [book, setBook] = useState<Book>();
+  const [book, setBook] = useState<Book | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -97,12 +106,48 @@ const BookDetailPage = () => {
       navigate("/login");
       return;
     }
+    if (!auth.membership) {
+      setModalState({
+        isOpen: true,
+        message:
+          "Bạn chưa đăng ký gói thành viên! \n Hãy đăng ký gói thành viên để đọc sách này!",
+      });
+      return;
+    }
+    if (!auth.user?.birthYear) {
+      setModalState({
+        isOpen: true,
+        message: "Bạn chưa cập nhật tuổi! Hãy cập nhật tuổi",
+      });
+      return;
+    }
+    if (book && !isUserYearOldValidated(book.rank, auth.user.birthYear)) {
+      setModalState({
+        isOpen: true,
+        message: "Bạn chưa đủ tuổi để đọc sách này",
+      });
+      return;
+    }
     navigate(`read`);
   };
 
   const handleBuy = () => {
     if (!auth.token) {
       navigate("/login");
+      return;
+    }
+    if (!auth.user?.birthYear) {
+      setModalState({
+        isOpen: true,
+        message: "Bạn chưa cập nhật tuổi! Hãy cập nhật tuổi",
+      });
+      return;
+    }
+    if (book && !isUserYearOldValidated(book.rank, auth.user.birthYear)) {
+      setModalState({
+        isOpen: true,
+        message: "Bạn chưa đủ tuổi để đọc sách này",
+      });
       return;
     }
     dispatch(AddBookToCart(book!));
@@ -136,6 +181,26 @@ const BookDetailPage = () => {
         </div>
         <Descriptions items={descriptionItems} bordered />
       </Card>
+      <Modal
+        title="Thông báo"
+        open={modalState.isOpen}
+        centered
+        className="text-center"
+        onOk={() =>
+          setModalState({
+            isOpen: false,
+            message: "",
+          })
+        }
+        onCancel={() =>
+          setModalState({
+            isOpen: false,
+            message: "",
+          })
+        }
+      >
+        {modalState.message}
+      </Modal>
     </div>
   );
 };
