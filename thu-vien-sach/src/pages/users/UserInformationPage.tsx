@@ -1,34 +1,22 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import User from "../../models/User";
 import { Card, Divider, Menu, MenuProps } from "antd";
 import UserInfo from "../../components/user/UserInfo";
 import MembershipCardInfo from "../../components/user/MembershipCardInfo";
-import Membership from "../../models/Membership";
-import axios, { AxiosResponse } from "axios";
-import { ResponseDTO } from "../../dtos/ResponseDTO";
-import { handleAPI } from "../../remotes/apiHandle";
-import { getAccessToken } from "../../remotes/axiosConfig";
-import { authState } from "../../redux/authSlice";
-import { useSelector } from "react-redux";
-import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import ReadBookList from "./ReadBookList";
 import PurchasedBookList from "./PurchasedBookList";
 import MyDictionary from "./MyDictionary";
 import RequestedBookList from "./RequestedBookList";
-import { Content } from "antd/es/layout/layout";
-import { SelectInfo } from "antd/es/calendar/generateCalendar";
-import { reFormatToDDMMYY } from "../../utils/datetimeUtil";
+import { UserMembership } from "../../models/UserMembership";
 
 interface PageProp {
   user: User | null;
+  membership: UserMembership | null;
 }
 
 const UserInformationPage = (props: PageProp) => {
-  const { user } = props;
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const [membership, setMembership] = useState<Membership | null>(null);
-  const [expiredDate, setExpiredDate] = useState<string | null>(null);
+  const { user, membership } = props;
   const [userAction, setUserAction] = useState<string>("dashboard");
   const menuItems: MenuProps["items"] = [
     {
@@ -52,21 +40,6 @@ const UserInformationPage = (props: PageProp) => {
       label: "Yêu cầu thêm sách",
     },
   ];
-
-  useEffect(() => {
-    getMembershipInfo();
-  }, []);
-
-  const getMembershipInfo = async () => {
-    try {
-      setLoading(true);
-      const res = await handleAPI(`membership/check`);
-      setMembership(res.data.data.membership);
-      setExpiredDate(reFormatToDDMMYY(res.data.data.expireDate));
-    } catch (error: any) {
-      console.log(error);
-    }
-  };
 
   const renderContent = (actionKey: string) => {
     switch (actionKey) {
@@ -104,10 +77,7 @@ const UserInformationPage = (props: PageProp) => {
               />
             </div>
             <div className="col">
-              <MembershipCardInfo
-                membership={membership}
-                expireDate={expiredDate ?? "N/a"}
-              />
+              <MembershipCardInfo membership={membership} />
             </div>
           </div>
           <Divider />
