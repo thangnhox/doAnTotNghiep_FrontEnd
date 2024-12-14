@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { authState } from "../../redux/authSlice";
 import { AddBookToCart } from "../../redux/cartSlice";
 import { isUserYearOldValidated } from "../../utils/userYearOldHandler";
+import { LikeOutlined } from "@ant-design/icons";
 
 const BookDetailPage = () => {
   const { bookId } = useParams();
@@ -153,6 +154,8 @@ const BookDetailPage = () => {
     dispatch(AddBookToCart(book!));
   };
 
+  const handleLike = async () => {};
+
   return isLoading ? (
     <Spin />
   ) : (
@@ -166,10 +169,13 @@ const BookDetailPage = () => {
             alt="Cover Book Image"
             className="rounded shadow-sm"
           />
+          <span>
+            <strong>Tác giả:</strong> <Text>{book?.AuthorName}</Text>
+          </span>
           <Text>
-            Tác giả: <Link>{book?.AuthorName}</Link>
+            <strong>Ngày phát hành: </strong>
+            {reFormatToDDMMYY(book?.PublishDate)}
           </Text>
-          <Text>Ngày phát hành: {reFormatToDDMMYY(book?.PublishDate)}</Text>
         </div>
         <div className="d-flex justify-content-center align-items-center m-3 gap-3">
           <Button type="primary" size="large" onClick={handelUserRead}>
@@ -177,6 +183,9 @@ const BookDetailPage = () => {
           </Button>
           <Button type="primary" size="large" onClick={handleBuy}>
             Mua {`${book?.Price} VND`}
+          </Button>
+          <Button danger type="primary" size="large" onClick={handleLike}>
+            Thích <LikeOutlined />
           </Button>
         </div>
         <Descriptions items={descriptionItems} bordered />

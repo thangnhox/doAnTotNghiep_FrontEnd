@@ -13,7 +13,7 @@ import {
   Spin,
   Typography,
 } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Category from "../models/Category";
 import Author from "../models/Author";
 
@@ -22,6 +22,7 @@ const HomePage = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -101,7 +102,7 @@ const HomePage = () => {
           {categories.map((cat) => (
             <Card
               onClick={() => {
-                console.log(cat.id);
+                navigate(`categories/${cat.id}`);
               }}
               key={cat.id}
               hoverable
@@ -124,9 +125,7 @@ const HomePage = () => {
         <div className="d-flex flex-row flex-wrap gap-3">
           {authors.map((author) => (
             <Card
-              onClick={() => {
-                console.log(author.id);
-              }}
+              onClick={() => navigate(`/authors/${author.id}`)}
               key={author.id}
               hoverable
             >

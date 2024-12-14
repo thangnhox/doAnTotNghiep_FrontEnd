@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import queryString from "query-string";
 import store from "../redux/reduxStore";
 
-const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:3000";
+const baseURL = process.env.REACT_APP_BASE_URL;
 
 export const getAccessToken = () => {
   let token = store.getState().auth.data.token;

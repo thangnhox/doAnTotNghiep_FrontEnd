@@ -16,7 +16,7 @@ import {
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { cartState, ChangeOpenCloseCart, ClearCart } from "../redux/cartSlice";
-import CartLayout from "./CartLayout";
+import CartLayout from "./cart/CartLayout";
 
 const UserTool = () => {
   const { Text } = Typography;

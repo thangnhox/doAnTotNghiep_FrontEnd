@@ -62,7 +62,7 @@ const HeaderComponent = () => {
   return (
     <Header className="d-flex flex-row justify-content-between align-items-center bg-white shadow-sm rounded">
       <Image
-        src="./images/logo.png"
+        src="https://firebasestorage.googleapis.com/v0/b/thu-vien-sach-truc-tuyen.firebasestorage.app/o/avatar%2Flogo.png?alt=media&token=a39fe59b-8fde-40db-b228-6c66284dda6d"
         width={60}
         preview={false}
         onClick={() => navigate("/")}

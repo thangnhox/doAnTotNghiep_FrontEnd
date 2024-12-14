@@ -1,21 +1,25 @@
+import { Button, Result } from "antd";
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 const PaymentResult = () => {
-  const {
-    partnerCode,
-    orderId,
-    amount,
-    orderInfo,
-    orderType,
-    transId,
-    resultCode,
-    message,
-    payType,
-    responseTime,
-    extraData,
-  } = useParams();
-  return <div>PaymentResult</div>;
+  const resultCode = new URLSearchParams(window.location.search).get(
+    "resultCode"
+  );
+  const message = new URLSearchParams(window.location.search).get("message");
+  const navigate = useNavigate();
+
+  return (
+    <Result
+      status={Number(resultCode) === 0 ? "success" : "error"}
+      title={message}
+      extra={[
+        <Button type="primary" onClick={() => navigate(`/`)}>
+          Về trang chủ
+        </Button>,
+      ]}
+    />
+  );
 };
 
 export default PaymentResult;

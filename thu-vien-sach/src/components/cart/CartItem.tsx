@@ -1,8 +1,8 @@
 import { DeleteFilled } from "@ant-design/icons";
 import { Button, Divider, Image, List, Typography } from "antd";
 import { useDispatch } from "react-redux";
-import { RemoveBookFromCart } from "../redux/cartSlice";
-import Book from "../models/book/Book";
+import { RemoveBookFromCart } from "../../redux/cartSlice";
+import Book from "../../models/book/Book";
 
 interface Props {
   book: Book;

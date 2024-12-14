@@ -43,7 +43,7 @@ const BookCard = (props: Props) => {
           <Button
             type="primary"
             className="bg-success"
-            onClick={() => navigate(`/book/${BookID}`)}
+            onClick={() => navigate(`/books/${BookID}`)}
             style={{ borderRadius: 5 }}
           >
             Chi tiết

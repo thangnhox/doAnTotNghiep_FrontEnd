@@ -1,8 +1,8 @@
 import { Button, List, Typography } from "antd";
-import { CartState, ChangeOpenCloseCart } from "../redux/cartSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CartItem from "./CartItem";
+import { CartState, ChangeOpenCloseCart } from "../../redux/cartSlice";
 
 interface Props {
   cart: CartState;

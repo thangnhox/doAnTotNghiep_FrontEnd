@@ -3,6 +3,7 @@ export default interface Author {
   name: string;
   birthDate: string;
   description: string;
+  avatar: string | null;
   nationality: string;
   books: number;
 }

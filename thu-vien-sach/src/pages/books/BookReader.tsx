@@ -20,7 +20,7 @@ import { Note } from "../../models/Note";
 
 const BookReader = () => {
   const { bookId } = useParams();
-  const { Text, Title } = Typography;
+  const { Title } = Typography;
   const [isLoading, setLoading] = useState(false);
   const [noteLoading, setNoteLoading] = useState<boolean>(false);
   const [pageNum, setPage] = useState(1);
@@ -45,11 +45,25 @@ const BookReader = () => {
   }, [bookId]);
 
   useEffect(() => {
+    getLastPageRead();
     getContent();
     initNote();
     preloadImages(pageNum);
   }, [pageNum]);
 
+  const getLastPageRead = async () => {
+    try {
+      const res: AxiosResponse<
+        ResponseDTO<{
+          LastRead: number;
+          Progress: number;
+        }>
+      > = await handleAPI(`history/get/${bookId}`);
+      setPage(res.data.data.LastRead);
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
   const getContent = async () => {
     if (preloadedImages[pageNum]) {
       setImage(preloadedImages[pageNum]);

@@ -2,12 +2,12 @@ import { Button, List, Spin, Typography } from "antd";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { cartState } from "../../redux/cartSlice";
-import CartItem from "../../components/CartItem";
 import { AxiosResponse } from "axios";
 import { handleAPI } from "../../remotes/apiHandle";
 import { Discount } from "../../models/Discount";
 import { redirect, useNavigate } from "react-router-dom";
 import { AppConstants } from "../../appConstants";
+import CartItem from "../../components/cart/CartItem";
 
 const ConfirmOrder = () => {
   const { Title, Text } = Typography;

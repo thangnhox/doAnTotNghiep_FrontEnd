@@ -1,7 +1,6 @@
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import BookDetailPage from "../pages/books/BookDetailPage";
 import { Layout } from "antd";
-import { Content } from "antd/es/layout/layout";
 import HomePage from "../pages/HomePage";
 import NotFoundPage from "../pages/NotFoundPage";
 import HeaderComponent from "../components/HeaderComponent";
@@ -14,10 +13,12 @@ import BookReader from "../pages/books/BookReader";
 import UserInformationPage from "../pages/users/UserInformationPage";
 import { useSelector } from "react-redux";
 import { AuthState, authState } from "../redux/authSlice";
-import CategoriesPage from "../pages/CategoriesPage";
 import SubscribePage from "../pages/memberships/SubscribePage";
 import ConfirmOrder from "../pages/payment/ConfirmOrder";
 import PaymentResult from "../pages/payment/PaymentResult";
+import CategoryDetailPage from "../pages/categories/CategoryDetailPage";
+import CategoriesPage from "../pages/categories/CategoriesPage";
+import AuthorDetailPage from "../pages/authors/AuthorDetailPage";
 
 interface Props {
   authState: AuthState;
@@ -50,10 +51,15 @@ const MainRouter = () => {
                 />
               }
             />
-            <Route path="book/:bookId" element={<BookDetailPage />} />
             <Route path="books" element={<BookPage />} />
+            <Route path="books/:bookId" element={<BookDetailPage />} />
             <Route path="categories" element={<CategoriesPage />} />
+            <Route
+              path="categories/:categoryId"
+              element={<CategoryDetailPage />}
+            />
             <Route path="authors" element={<AuthorsPage />} />
+            <Route path="authors/:authorId" element={<AuthorDetailPage />} />
             <Route path="login" element={<AuthPage action="LOGIN" />} />
             <Route path="register" element={<AuthPage action="REGISTER" />} />
             <Route path="user/verify/:token" element={<VerifyPage />} />
@@ -63,9 +69,9 @@ const MainRouter = () => {
               path="notification/payment-result"
               element={<PaymentResult />}
             />
-            <Route path="not-found" element={<NotFoundPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
-          <Route path="book/:bookId/read" element={<BookReader />} />
+          <Route path="books/:bookId/read" element={<BookReader />} />
         </Routes>
         <FooterComponent />
       </Layout>
