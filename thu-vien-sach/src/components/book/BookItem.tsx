@@ -17,6 +17,18 @@ interface Props {
 const BookItem = (props: Props) => {
   const { bookId, description, title, cover_url, progress, total, action } = props;
   const navigate = useNavigate();
+
+  const handleDownload = async () => {
+    const res = await handleAPI(`books/download/${bookId}`, {}, "get", "blob")
+    const pdfFileUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+    let aTag = document.createElement("a");
+    aTag.href = pdfFileUrl;
+    aTag.setAttribute("download", title)
+    document.body.append(aTag);
+    aTag.click();
+    aTag.remove();
+  }
+
   return (
     <Card>
       <div className="d-flex flex-row justify-content-between align-items-center">
@@ -46,14 +58,7 @@ const BookItem = (props: Props) => {
             if (action === "read") {
               navigate(`/books/${bookId}`)
             } else {
-              const res = await handleAPI(`books/download/${bookId}`, {}, "get", "blob")
-              const pdfFileUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
-              let aTag = document.createElement("a");
-              aTag.href = pdfFileUrl;
-              aTag.setAttribute("download", title)
-              document.body.append(aTag);
-              aTag.click();
-              aTag.remove();
+              handleDownload()
             }
           }}>
             {action === "read" ? "Đọc" : "Download"}
