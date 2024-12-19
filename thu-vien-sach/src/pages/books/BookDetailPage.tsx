@@ -34,6 +34,7 @@ const BookDetailPage = () => {
   });
   const auth = useSelector(authState);
   const [book, setBook] = useState<Book | null>(null);
+  const [isBought, setIsBought] = useState<boolean>(false)
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -94,6 +95,11 @@ const BookDetailPage = () => {
         `/books/fetch/${bookId}`
       );
       setBook(res.data.data);
+      const boughtBookRes: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`order/boughtBooks`);
+      console.log(boughtBookRes)
+      if (boughtBookRes.data.data.some((boughtBooks, _, __) => boughtBooks.BookID === res.data.data.BookID)) {
+        setIsBought(true)
+      }
     } catch (error: any) {
       message.error(error);
       console.log(error);
@@ -107,7 +113,7 @@ const BookDetailPage = () => {
       navigate("/login");
       return;
     }
-    if (!auth.membership) {
+    if (!isBought && !auth.membership) {
       setModalState({
         isOpen: true,
         message:
@@ -154,7 +160,18 @@ const BookDetailPage = () => {
     dispatch(AddBookToCart(book!));
   };
 
-  const handleLike = async () => {};
+  const handleLike = async () => { };
+
+  const downloadBook = async (title: string) => {
+    const res = await handleAPI(`books/download/${bookId}`, {}, "get", "blob")
+    const pdfFileUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+    let aTag = document.createElement("a");
+    aTag.href = pdfFileUrl;
+    aTag.setAttribute("download", title)
+    document.body.append(aTag);
+    aTag.click();
+    aTag.remove();
+  }
 
   return isLoading ? (
     <Spin />
@@ -181,9 +198,16 @@ const BookDetailPage = () => {
           <Button type="primary" size="large" onClick={handelUserRead}>
             Đọc
           </Button>
-          <Button type="primary" size="large" onClick={handleBuy}>
-            Mua {`${book?.Price} VND`}
-          </Button>
+          {
+            !isBought ? <Button type="primary" size="large" onClick={handleBuy}>
+              Mua {`${book?.Price} VND`}
+            </Button> :
+              <Button type="primary" size="large" onClick={async () => {
+                book !== null && downloadBook(book.Title)
+              }} >
+                Download
+              </Button>
+          }
           <Button danger type="primary" size="large" onClick={handleLike}>
             Thích <LikeOutlined />
           </Button>
