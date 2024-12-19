@@ -50,6 +50,7 @@ const ReadBookList = () => {
           cover_url={item.cover_url}
           progress={item.Progress}
           total={item.PageCount}
+          action="read"
         />
       )}
     />

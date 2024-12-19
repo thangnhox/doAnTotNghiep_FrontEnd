@@ -1,7 +1,8 @@
-import React from "react";
-import Book from "../../models/book/Book";
-import { Button, Card, Divider, Image, List, Progress, Typography } from "antd";
+
+import { Button, Card, Divider, Image, Progress, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
+import { handleAPI } from "../../remotes/apiHandle";
+
 
 interface Props {
   bookId: number;
@@ -10,10 +11,11 @@ interface Props {
   description?: string;
   progress?: number;
   total?: number;
+  action: "read" | "download"
 }
 
 const BookItem = (props: Props) => {
-  const { bookId, description, title, cover_url, progress, total } = props;
+  const { bookId, description, title, cover_url, progress, total, action } = props;
   const navigate = useNavigate();
   return (
     <Card>
@@ -40,8 +42,21 @@ const BookItem = (props: Props) => {
               status="active"
             />
           )}
-          <Button type="primary" onClick={() => navigate(`/books/${bookId}`)}>
-            Đọc
+          <Button type="primary" onClick={async () => {
+            if (action === "read") {
+              navigate(`/books/${bookId}`)
+            } else {
+              const res = await handleAPI(`books/download/${bookId}`, {}, "get", "blob")
+              const pdfFileUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+              let aTag = document.createElement("a");
+              aTag.href = pdfFileUrl;
+              aTag.setAttribute("download", title)
+              document.body.append(aTag);
+              aTag.click();
+              aTag.remove();
+            }
+          }}>
+            {action === "read" ? "Đọc" : "Download"}
           </Button>
         </div>
       </div>

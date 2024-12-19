@@ -2,17 +2,11 @@ import React, { useEffect, useState } from "react";
 import { handleAPI } from "../../remotes/apiHandle";
 import { List, Spin } from "antd";
 import BookItem from "../../components/book/BookItem";
+import Book from "../../models/book/Book";
 
 const PurchasedBookList = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [purchasedBook, setPurchasedBook] = useState<
-    {
-      bookId: number;
-      title: string;
-      cover_url: string;
-      description: string;
-    }[]
-  >([]);
+  const [purchasedBook, setPurchasedBook] = useState<Book[]>([]);
 
   useEffect(() => {
     getPurchasedBook();
@@ -36,14 +30,15 @@ const PurchasedBookList = () => {
   ) : (
     <List
       bordered
-      rowKey={(item) => item.bookId}
+      rowKey={(item) => item.BookID}
       dataSource={purchasedBook}
       renderItem={(item) => (
         <BookItem
-          description={item.description}
-          bookId={item.bookId}
-          title={item.title}
+          description={item.Description}
+          bookId={item.BookID}
+          title={item.Title}
           cover_url={item.cover_url}
+          action="download"
         />
       )}
     />
