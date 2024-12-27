@@ -1,6 +1,6 @@
-import { Button, Divider, Image, Input } from "antd";
+import { Button, Divider, Image, Input, Select } from "antd";
 import { Header } from "antd/es/layout/layout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AddAuth, authState, AuthState } from "../redux/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppConstants } from "../appConstants";
@@ -11,9 +11,15 @@ import axios, { AxiosResponse } from "axios";
 import { ResponseDTO } from "../dtos/ResponseDTO";
 import { User } from "firebase/auth";
 import { UserMembership } from "../models/UserMembership";
+import Book from "../models/book/Book";
+import { debounceSearch } from "../utils/debouce";
+import { handleAPI } from "../remotes/apiHandle";
+
 
 const HeaderComponent = () => {
   const auth: AuthState = useSelector(authState);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [searchedBooks, setSearchedBooksSet] = useState<Book[]>([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -59,6 +65,30 @@ const HeaderComponent = () => {
     }
   };
 
+
+
+
+  const handleSearch = async (title: string) => {
+    console.log("Searching");
+    setLoading(true)
+    if (!title.trim()) {
+      return;
+    }
+    try {
+      const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(
+        `books/search?title=${title}&field=Title,AuthorName`
+      );
+      setSearchedBooksSet(res.data.data);
+    } catch (error: any) {
+      console.log(error);
+    }
+    finally {
+      setLoading(false)
+    }
+  };
+
+
+
   return (
     <Header className="d-flex flex-row justify-content-between align-items-center bg-white shadow-sm rounded">
       <Image
@@ -68,9 +98,24 @@ const HeaderComponent = () => {
         onClick={() => navigate("/")}
       />
       <div className="d-flex flex-row align-items-center gap-3">
-        <Input.Search
-          placeholder="Nhập tên sách cần tìm"
-          style={{ width: "250px" }}
+        <Select
+          showSearch
+          placeholder={"Nhập tên sách"}
+          defaultActiveFirstOption={false}
+          notFoundContent={"Không tìm thấy"}
+          loading={loading}
+          optionFilterProp="label"
+          onSearch={debounceSearch(handleSearch, 1000)}
+          value={searchedBooks}
+          onSelect={(val) => {
+            navigate(`/books/${val}`);
+            setSearchedBooksSet([]);
+          }}
+          style={{ width: 500 }}
+          options={(searchedBooks || []).map((book: Book) => ({
+            value: book.BookID,
+            label: book.Title,
+          }))}
         />
 
         <Divider type="vertical" />
