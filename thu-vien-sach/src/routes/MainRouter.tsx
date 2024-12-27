@@ -62,7 +62,7 @@ const MainRouter = () => {
             <Route path="authors/:authorId" element={<AuthorDetailPage />} />
             <Route path="login" element={<AuthPage action="LOGIN" />} />
             <Route path="register" element={<AuthPage action="REGISTER" />} />
-            <Route path="user/verify/:token" element={<VerifyPage />} />
+            <Route path="notification/user/verify/:token" element={<VerifyPage />} />
             <Route path="membership/subscribe" element={<SubscribePage />} />
             <Route path="confirm-order" element={<ConfirmOrder />} />
             <Route
