@@ -11,14 +11,21 @@ import BookPage from "../pages/books/BookPage";
 import AuthorsPage from "../pages/authors/AuthorsPage";
 import BookReader from "../pages/books/BookReader";
 import UserInformationPage from "../pages/users/UserInformationPage";
-import { useSelector } from "react-redux";
-import { AuthState, authState } from "../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AddAuth, AuthState, authState } from "../redux/authSlice";
 import SubscribePage from "../pages/memberships/SubscribePage";
 import ConfirmOrder from "../pages/payment/ConfirmOrder";
 import PaymentResult from "../pages/payment/PaymentResult";
 import CategoryDetailPage from "../pages/categories/CategoryDetailPage";
 import CategoriesPage from "../pages/categories/CategoriesPage";
 import AuthorDetailPage from "../pages/authors/AuthorDetailPage";
+import axios, { AxiosResponse } from "axios";
+import { User } from "firebase/auth";
+import { useEffect } from "react";
+import { AppConstants } from "../appConstants";
+import { ResponseDTO } from "../dtos/ResponseDTO";
+import { UserMembership } from "../models/UserMembership";
+import { validateToken } from "../utils/jwtUtil";
 
 interface Props {
   authState: AuthState;
@@ -34,6 +41,51 @@ const MainLayout = () => {
 
 const MainRouter = () => {
   const autState = useSelector(authState);
+
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    checkLogin();
+  }, []);
+
+  const checkLogin = async () => {
+    try {
+      const res = localStorage.getItem(AppConstants.token);
+      if (!res) {
+        return;
+      }
+      if (!validateToken(res)) {
+        return;
+      }
+
+      const userRes: AxiosResponse<ResponseDTO<User>> = await axios.get(
+        `${process.env.REACT_APP_BASE_URL}/user/info`,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(res)}`,
+          },
+        }
+      );
+
+      const membershipRes: AxiosResponse<ResponseDTO<UserMembership>> =
+        await axios.get(`${process.env.REACT_APP_BASE_URL}/membership/check`, {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(res)}`,
+          },
+        });
+
+      dispatch(
+        AddAuth({
+          token: JSON.parse(res),
+          user: userRes.data.data,
+          membership: membershipRes.data.data,
+        })
+      );
+    } catch (e: any) {
+      console.log(e);
+    }
+  };
 
   return (
     <BrowserRouter>
