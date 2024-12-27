@@ -99,6 +99,7 @@ const HeaderComponent = () => {
       />
       <div className="d-flex flex-row align-items-center gap-3">
         <Select
+          suffixIcon={null}
           showSearch
           placeholder={"Nhập tên sách"}
           defaultActiveFirstOption={false}
