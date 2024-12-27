@@ -10,7 +10,6 @@ import { AddAuth } from '../redux/authSlice';
 
 const VerifyPage = () => {
   const { token } = useParams();
-  const [isLoading, setLoading] = useState<boolean>(false)
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -21,23 +20,24 @@ const VerifyPage = () => {
 
   const verifyAccount = async () => {
     try {
-      setLoading(true)
       const res: AxiosResponse<ResponseDTO<Token>> = await handleAPI(`user/verify/${token}`);
       if (res.status === 201) {
-        dispatch(AddAuth({ token: res.data.data }))
-        navigate('/', { replace: true })
-        message.success('Xác minh thành công')
+        dispatch(AddAuth({ token: res.data.data, user: null, membership: null }))
+        const userInfo = await handleAPI('user/info', null, 'get');
+        if (userInfo.status === 200) {
+          dispatch(AddAuth({ token: res.data.data, user: userInfo.data.data, membership: null }))
+          navigate('/', { replace: true })
+          message.success('Xác minh thành công')
+        }
       }
     } catch (error: any) {
       message.error(error)
       console.log(error)
-    } finally {
-      setLoading(false)
     }
   }
 
   return (
-    <div>VerifyPage</div>
+    <div></div>
   )
 }
 
