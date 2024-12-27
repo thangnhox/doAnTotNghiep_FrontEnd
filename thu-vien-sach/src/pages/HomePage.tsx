@@ -30,14 +30,14 @@ const HomePage = () => {
 
   const getBooks = async () => {
     const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(
-      `books?page=1&pageSize=10&sort=IsRecommended&order=desc`
+      `books?page=1&pageSize=10`
     );
     setBooks(res.data.data);
   };
 
   const getCategories = async () => {
     const res: AxiosResponse<ResponseDTO<Category[]>> = await handleAPI(
-      `categories?page=1&pageSize=10&isRecommended=1`
+      `categories?page=1&pageSize=10`
     );
     setCategories(res.data.data);
   };
