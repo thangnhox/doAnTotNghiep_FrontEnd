@@ -1,16 +1,12 @@
 import { Button, Divider, Image, Input, Select } from "antd";
 import { Header } from "antd/es/layout/layout";
-import { useEffect, useState } from "react";
-import { AddAuth, authState, AuthState } from "../redux/authSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { AppConstants } from "../appConstants";
-import { validateToken } from "../utils/jwtUtil";
+import { useState } from "react";
+import { authState, AuthState } from "../redux/authSlice";
+import { useSelector } from "react-redux";
 import UserTool from "./UserTool";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { ResponseDTO } from "../dtos/ResponseDTO";
-import { User } from "firebase/auth";
-import { UserMembership } from "../models/UserMembership";
 import Book from "../models/book/Book";
 import { debounceSearch } from "../utils/debouce";
 import { handleAPI } from "../remotes/apiHandle";
@@ -20,52 +16,7 @@ const HeaderComponent = () => {
   const auth: AuthState = useSelector(authState);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchedBooks, setSearchedBooksSet] = useState<Book[]>([]);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    checkLogin();
-  }, []);
-
-  const checkLogin = async () => {
-    try {
-      const res = localStorage.getItem(AppConstants.token);
-      if (!res) {
-        return;
-      }
-      if (!validateToken(res)) {
-        return;
-      }
-
-      const userRes: AxiosResponse<ResponseDTO<User>> = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/user/info`,
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(res).token}`,
-          },
-        }
-      );
-
-      const membershipRes: AxiosResponse<ResponseDTO<UserMembership>> =
-        await axios.get(`${process.env.REACT_APP_BASE_URL}/membership/check`, {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(res).token}`,
-          },
-        });
-
-      dispatch(
-        AddAuth({
-          token: res,
-          user: userRes.data.data,
-          membership: membershipRes.data.data,
-        })
-      );
-    } catch (e: any) {
-      console.log(e);
-    }
-  };
-
-
 
 
   const handleSearch = async (title: string) => {

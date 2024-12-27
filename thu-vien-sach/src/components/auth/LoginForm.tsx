@@ -27,7 +27,6 @@ import Membership from "../../models/Membership";
 const LoginForm = () => {
   const [loginForm] = useForm();
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [isRememberMe, setRememberMe] = useState<boolean>(false);
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { Text } = Typography;
@@ -65,6 +64,10 @@ const LoginForm = () => {
               },
             }
           );
+        localStorage.setItem(
+          AppConstants.token,
+          JSON.stringify(res.data.data)
+        );
         dispatch(
           AddAuth({
             token: token,
@@ -72,13 +75,6 @@ const LoginForm = () => {
             membership: membershipRes.data.data ?? null,
           })
         );
-
-        if (isRememberMe) {
-          localStorage.setItem(
-            AppConstants.token,
-            JSON.stringify(res.data.data)
-          );
-        }
         navigator("/", { replace: true });
         message.success("Đăng nhập thành công");
       }
@@ -118,12 +114,10 @@ const LoginForm = () => {
           JSON.stringify({ token: token })
         );
         dispatch(AddAuth({ token: token, user: userRes.data.data }));
-        if (isRememberMe) {
-          localStorage.setItem(
-            AppConstants.token,
-            JSON.stringify(res.data.data)
-          );
-        }
+        localStorage.setItem(
+          AppConstants.token,
+          JSON.stringify(res.data.data)
+        );
         navigator("/", { replace: true });
         message.success("Đăng nhập thành công");
       }
@@ -167,11 +161,11 @@ const LoginForm = () => {
         >
           <Input.Password />
         </Form.Item>
-        <Form.Item initialValue={isRememberMe} valuePropName="checked">
+        {/* <Form.Item initialValue={isRememberMe} valuePropName="checked">
           <Checkbox onChange={(val) => setRememberMe(val.target.checked)}>
             Ghi nhớ đăng nhập
           </Checkbox>
-        </Form.Item>
+        </Form.Item> */}
         <Button type="primary" onClick={() => loginForm.submit()}>
           Đăng nhập{" "}
         </Button>
