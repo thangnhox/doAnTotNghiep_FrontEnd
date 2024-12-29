@@ -72,9 +72,15 @@ const BookReader = () => {
   };
 
   const getLastPageRead = async () => {
-    const res: AxiosResponse<ResponseDTO<BookReadHistory>> =
-      await handleAPI(`history/get/${bookId}`);
-    setPage(res.data.data.LastRead ?? 1);
+    try {
+      const res: AxiosResponse<ResponseDTO<BookReadHistory>> =
+        await handleAPI(`history/get/${bookId}`);
+      setPage(res.data.data.LastRead);
+    } catch (error) {
+      console.error("Error getting last page read:", error);
+      setPage(1);
+
+    }
   };
 
   const getContent = async (pageNum: number) => {
