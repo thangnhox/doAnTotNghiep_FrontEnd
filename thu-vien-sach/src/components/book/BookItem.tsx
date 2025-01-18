@@ -18,6 +18,8 @@ const BookItem = (props: Props) => {
   const { bookId, description, title, cover_url, progress, total, action } = props;
   const navigate = useNavigate();
 
+  console.log(bookId)
+
   const handleDownload = async () => {
     const res = await handleAPI(`books/download/${bookId}`, {}, "get", "blob")
     const pdfFileUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));

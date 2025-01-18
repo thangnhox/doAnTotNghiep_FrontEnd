@@ -7,7 +7,7 @@ const ReadBookList = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [readBooks, setReadBooks] = useState<
     {
-      BookId: number;
+      BookID: number;
       Title: string;
       cover_url: string;
       PageCount: number;
@@ -33,28 +33,25 @@ const ReadBookList = () => {
     }
   };
 
-  return isLoading ? (
-    <Spin />
-  ) : readBooks.length === 0 ? (
-    <Empty />
-  ) : (
-    <List
-      bordered
-      dataSource={readBooks}
-      rowKey={(item) => item.BookId}
-      renderItem={(item) => (
+  return <List
+    loading={isLoading}
+    bordered
+    dataSource={readBooks}
+    rowKey={(item) => item.BookID}
+    renderItem={(item) => (
+      <div className="m-3" >
         <BookItem
-          key={item.BookId}
-          bookId={item.BookId}
+          key={item.BookID}
+          bookId={item.BookID}
           title={item.Title}
           cover_url={item.cover_url}
           progress={item.Progress}
           total={item.PageCount}
           action="read"
         />
-      )}
-    />
-  );
+      </div>
+    )}
+  />
 };
 
 export default ReadBookList;

@@ -3,6 +3,7 @@ import { Button, Divider, Image, List, Typography } from "antd";
 import { useDispatch } from "react-redux";
 import { RemoveBookFromCart } from "../../redux/cartSlice";
 import Book from "../../models/book/Book";
+import { numbericFormat } from "../../utils/numbericUtil";
 
 interface Props {
   book: Book;
@@ -18,7 +19,7 @@ const CartItem = (props: Props) => {
         <Image src={book.cover_url} preview={false} width={100} />
         <div className="d-flex flex-column" style={{ flex: 1 }}>
           <Title level={5}>{book.Title}</Title>
-          <Text type="secondary">{book.Price}</Text>
+          <Text type="secondary">{numbericFormat(Number(book.Price))}</Text>
         </div>
         <Divider type="vertical" />
         <Button

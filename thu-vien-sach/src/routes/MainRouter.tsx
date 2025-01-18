@@ -26,10 +26,9 @@ import { AppConstants } from "../appConstants";
 import { ResponseDTO } from "../dtos/ResponseDTO";
 import { UserMembership } from "../models/UserMembership";
 import { validateToken } from "../utils/jwtUtil";
-
-interface Props {
-  authState: AuthState;
-}
+import ConfirmSubscriptionOrder from "../pages/payment/ConfirmSubscriptionOrder";
+import ResetPasswordPage from "../components/auth/ResetPasswordPage";
+import ResetPasswordResult from "../components/auth/ResetPasswordResult";
 
 const MainLayout = () => {
   return (
@@ -114,8 +113,11 @@ const MainRouter = () => {
             <Route path="authors/:authorId" element={<AuthorDetailPage />} />
             <Route path="login" element={<AuthPage action="LOGIN" />} />
             <Route path="register" element={<AuthPage action="REGISTER" />} />
+            <Route path="reset-password" element={<AuthPage action="RESET-PASSWORD" />} />
+            <Route path="notification/resetPassword/:token" element={<ResetPasswordResult />} />
             <Route path="notification/user/verify/:token" element={<VerifyPage />} />
             <Route path="membership/subscribe" element={<SubscribePage />} />
+            <Route path="membership/subscribe/:membershipId" element={<ConfirmSubscriptionOrder />} />
             <Route path="confirm-order" element={<ConfirmOrder />} />
             <Route
               path="notification/payment-result"

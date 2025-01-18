@@ -4,11 +4,13 @@ import Membership from "../../models/Membership";
 import { AxiosResponse } from "axios";
 import { ResponseDTO } from "../../dtos/ResponseDTO";
 import { handleAPI } from "../../remotes/apiHandle";
+import { useNavigate } from "react-router-dom";
 
 const SubscribePage = () => {
   const { Title, Text } = Typography;
   const [isLoading, setLoading] = useState<boolean>(false);
   const [memberships, setMemberships] = useState<Membership[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getMemberships();
@@ -29,7 +31,7 @@ const SubscribePage = () => {
     }
   };
 
-  const performPurchase = (id: number) => {};
+
 
   return isLoading ? (
     <Spin />
@@ -38,9 +40,9 @@ const SubscribePage = () => {
       {memberships.map((item) => (
         <Card className="w-25 " title={item.name} key={item.id}>
           <ul className="text-start">
-            {/* {item.description.map((des) => (
+            {item.description.map((des) => (
               <li>{des}</li>
-            ))} */}
+            ))}
           </ul>
           <Divider type="horizontal" />
           <div className="d-flex flex-column">
@@ -48,7 +50,7 @@ const SubscribePage = () => {
             <Button
               className="mt-3"
               type="primary"
-              onClick={() => performPurchase(item.id)}
+              onClick={() => navigate(`/membership/subscribe/${item.id}`)}
             >
               Đăng ký
             </Button>

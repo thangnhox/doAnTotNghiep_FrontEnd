@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CartItem from "./CartItem";
 import { CartState, ChangeOpenCloseCart } from "../../redux/cartSlice";
+import { numbericFormat } from "../../utils/numbericUtil";
 
 interface Props {
   cart: CartState;
@@ -29,7 +30,7 @@ const CartLayout = (props: Props) => {
         <div className="d-flex flex-column w-100 gap-3">
           <div className="d-flex flex-row p-2 justify-content-between align-items-center w-100">
             <Text>Tổng giá</Text>
-            <Text>{cart.total} VND</Text>
+            <Text>{numbericFormat(Number(cart.total))} VND</Text>
           </div>
           <Button
             onClick={() => {

@@ -3,12 +3,12 @@ import User from "../../models/User";
 import { Card, Divider, Menu, MenuProps } from "antd";
 import UserInfo from "../../components/user/UserInfo";
 import MembershipCardInfo from "../../components/user/MembershipCardInfo";
-import Dashboard from "./Dashboard";
 import ReadBookList from "./ReadBookList";
 import PurchasedBookList from "./PurchasedBookList";
 import MyDictionary from "./MyDictionary";
 import RequestedBookList from "./RequestedBookList";
 import { UserMembership } from "../../models/UserMembership";
+import LikedBook from "./LikedBook";
 
 interface PageProp {
   user: User | null;
@@ -19,10 +19,6 @@ const UserInformationPage = (props: PageProp) => {
   const { user, membership } = props;
   const [userAction, setUserAction] = useState<string>("dashboard");
   const menuItems: MenuProps["items"] = [
-    {
-      key: "dashboard",
-      label: "Trang chủ",
-    },
     {
       key: "history-read-book",
       label: "Sách đã đọc",
@@ -36,6 +32,10 @@ const UserInformationPage = (props: PageProp) => {
       label: "Từ điển",
     },
     {
+      key: "liked-book",
+      label: "Sách yêu thích",
+    },
+    {
       key: "book-request",
       label: "Yêu cầu thêm sách",
     },
@@ -43,8 +43,6 @@ const UserInformationPage = (props: PageProp) => {
 
   const renderContent = (actionKey: string) => {
     switch (actionKey) {
-      case "dashboard":
-        return <Dashboard />;
       case "history-read-book":
         return <ReadBookList />;
       case "history-purchased-book":
@@ -53,8 +51,10 @@ const UserInformationPage = (props: PageProp) => {
         return <MyDictionary />;
       case "book-request":
         return <RequestedBookList />;
+      case "liked-book":
+        return <LikedBook />
       default:
-        return <Dashboard />;
+        return <ReadBookList />;
     }
   };
 

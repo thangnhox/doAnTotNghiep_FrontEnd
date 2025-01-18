@@ -21,6 +21,7 @@ import { authState } from "../../redux/authSlice";
 import { AddBookToCart } from "../../redux/cartSlice";
 import { isUserYearOldValidated } from "../../utils/userYearOldHandler";
 import { LikeOutlined } from "@ant-design/icons";
+import { numbericFormat } from "../../utils/numbericUtil";
 
 const BookDetailPage = () => {
   const { bookId } = useParams();
@@ -35,6 +36,7 @@ const BookDetailPage = () => {
   const auth = useSelector(authState);
   const [book, setBook] = useState<Book | null>(null);
   const [isBought, setIsBought] = useState<boolean>(false)
+  const [isLiked, setIsLiked] = useState<boolean>(false)
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -95,10 +97,15 @@ const BookDetailPage = () => {
         `/books/fetch/${bookId}`
       );
       setBook(res.data.data);
-      const boughtBookRes: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`order/boughtBooks`);
-      console.log(boughtBookRes)
-      if (boughtBookRes.data.data.some((boughtBooks, _, __) => boughtBooks.BookID === res.data.data.BookID)) {
-        setIsBought(true)
+      if (auth.token) {
+        const boughtBookRes: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`order/boughtBooks`);
+        if (boughtBookRes.data.data.some((boughtBooks, _, __) => boughtBooks.BookID === res.data.data.BookID)) {
+          setIsBought(true)
+        }
+        const isLiked = await handleAPI(`books/liked/${bookId}`);
+        if (isLiked.data.data.liked) {
+          setIsLiked(true)
+        }
       }
     } catch (error: any) {
       message.error(error);
@@ -160,7 +167,47 @@ const BookDetailPage = () => {
     dispatch(AddBookToCart(book!));
   };
 
-  const handleLike = async () => { };
+  const handleLike = async () => {
+    if (!auth.token) {
+      navigate("/login");
+    }
+    try {
+      const res = await handleAPI(`books/like/${bookId}`);
+      if (res.status === 200) {
+        const action = res.data.data.action;
+        if (action === "Liked") {
+          message.success("Thích sách thành công");
+          setBook((prev) => {
+            if (prev) {
+              return {
+                ...prev,
+                LikesCount: prev.LikesCount + 1,
+              };
+            }
+            return prev;
+          });
+          setIsLiked(true)
+        }
+        if (action === "Disliked") {
+          message.success("Bỏ thích sách thành công");
+          setBook((prev) => {
+            if (prev) {
+              return {
+                ...prev,
+                LikesCount: prev.LikesCount - 1,
+              };
+            }
+            return prev;
+          });
+          setIsLiked(false)
+        }
+      }
+    }
+    catch (error: any) {
+      message.error(error);
+      console.log(error);
+    }
+  };
 
   const downloadBook = async (title: string) => {
     const res = await handleAPI(`books/download/${bookId}`, {}, "get", "blob")
@@ -200,7 +247,7 @@ const BookDetailPage = () => {
           </Button>
           {
             !isBought ? <Button type="primary" size="large" onClick={handleBuy}>
-              Mua {`${book?.Price} VND`}
+              Mua {`${numbericFormat(Number(book?.Price))} VND`}
             </Button> :
               <Button type="primary" size="large" onClick={async () => {
                 book !== null && downloadBook(book.Title)
@@ -209,7 +256,7 @@ const BookDetailPage = () => {
               </Button>
           }
           <Button danger type="primary" size="large" onClick={handleLike}>
-            Thích <LikeOutlined />
+            {isLiked ? "Bỏ thích" : "Thích"}
           </Button>
         </div>
         <Descriptions items={descriptionItems} bordered />

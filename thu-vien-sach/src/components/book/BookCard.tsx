@@ -1,6 +1,7 @@
 import Book from "../../models/book/Book";
 import { Button, Card, Image, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
+import { numbericFormat } from "../../utils/numbericUtil";
 
 interface Props {
   book: Book;
@@ -15,7 +16,7 @@ const BookCard = (props: Props) => {
     <Card
       title={<Typography.Title level={4}>{Title}</Typography.Title>}
       style={{
-        width: 400,
+        width: 300,
         borderRadius: 10,
         overflow: "hidden",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
@@ -32,10 +33,10 @@ const BookCard = (props: Props) => {
 
         <div className="mt-3 text-center">
           <Typography.Text className="d-block mb-1">
-            <strong>Giá: </strong> {Price} VND
+            <strong>Giá: </strong> {numbericFormat(Number(Price))} VND
           </Typography.Text>
           <Typography.Text>
-            <strong>Số trang: </strong> {PageCount}
+            <strong>Số trang: </strong> {numbericFormat(Number(PageCount))}
           </Typography.Text>
         </div>
 

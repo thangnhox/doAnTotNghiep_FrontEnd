@@ -23,6 +23,7 @@ import { signInWithPopup } from "firebase/auth";
 import { firebaseAuth, authProvider } from "../../firebase/firebaseConfig";
 import User from "../../models/User";
 import Membership from "../../models/Membership";
+import Link from "antd/es/typography/Link";
 
 const LoginForm = () => {
   const [loginForm] = useForm();
@@ -130,7 +131,7 @@ const LoginForm = () => {
 
   return (
     <Card loading={isLoading} title="Đăng nhập">
-      <Form form={loginForm} onFinish={login}>
+      <Form form={loginForm} onFinish={login} layout="vertical" >
         <Form.Item
           name={"email"}
           label="Email"
@@ -166,6 +167,9 @@ const LoginForm = () => {
             Ghi nhớ đăng nhập
           </Checkbox>
         </Form.Item> */}
+        <Form.Item>
+          <Link href="/reset-password">Đặt lại mật khẩu</Link>
+        </Form.Item>
         <Button type="primary" onClick={() => loginForm.submit()}>
           Đăng nhập{" "}
         </Button>
