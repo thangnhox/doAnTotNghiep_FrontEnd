@@ -1,4 +1,4 @@
-import { Button, Divider, Image, Input, Select } from "antd";
+import { Button, Divider, Image, Select } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { useState } from "react";
 import { authState, AuthState } from "../redux/authSlice";
@@ -43,7 +43,7 @@ const HeaderComponent = () => {
   return (
     <Header className="d-flex flex-row justify-content-between align-items-center bg-white shadow-sm rounded">
       <Image
-        src="https://firebasestorage.googleapis.com/v0/b/thu-vien-sach-truc-tuyen.firebasestorage.app/o/avatar%2Flogo.png?alt=media&token=a39fe59b-8fde-40db-b228-6c66284dda6d"
+        src="../images/books.png"
         width={60}
         preview={false}
         onClick={() => navigate("/")}
