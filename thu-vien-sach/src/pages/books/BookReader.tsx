@@ -41,45 +41,46 @@ const BookReader = () => {
   }, []);
 
   useEffect(() => {
-    getData();
+    if (pageNum) getData();
   }, [pageNum]);
 
   const getData = async () => {
-    if (!pageNum) return;
     try {
-      setLoading(true)
-      getContent(pageNum ?? 1);
-      updateReadingHistory(pageNum ?? 1);
-      loadNote();
-      preloadImages(pageNum ?? 1);
-
+      setLoading(true);
+      await Promise.all([getContent(pageNum!), updateReadingHistory(pageNum!), loadNote()]);
+      preloadImages(pageNum!);
     } catch (error) {
-      console.log(error)
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false)
-    }
-  }
+  };
 
   const updateReadingHistory = async (pageNum: number) => {
-    await handleAPI(`history/update/${bookId}/${pageNum}`)
-  }
-
+    try {
+      await handleAPI(`history/update/${bookId}/${pageNum}`);
+    } catch (error) {
+      console.error("Error updating reading history:", error);
+    }
+  };
 
   const fetchBookDetails = async () => {
-    const res = await handleAPI(`books/fetch/${bookId}`);
-    setBook(res.data.data);
+    try {
+      const res = await handleAPI(`books/fetch/${bookId}`);
+      setBook(res.data.data);
+    } catch (error) {
+      console.error("Error fetching book details:", error);
+    }
   };
 
   const getLastPageRead = async () => {
     try {
       const res: AxiosResponse<ResponseDTO<BookReadHistory>> =
         await handleAPI(`history/get/${bookId}`);
-      setPage(res.data.data.LastRead);
+      setPage(res.data.data.LastRead || 1);
     } catch (error) {
       console.error("Error getting last page read:", error);
       setPage(1);
-
     }
   };
 
@@ -88,51 +89,54 @@ const BookReader = () => {
       setImage(preloadedImages[pageNum]);
       return;
     }
-
-    const res = await handleAPI(
-      `/books/read/${bookId}?page=${pageNum}&width=1000&height=1000&density=200`,
-      null,
-      "get",
-      "blob"
-    );
-    const blobUrl = URL.createObjectURL(res.data);
-    setImage(blobUrl);
-    setPreloadedImages((prev) => ({ ...prev, [pageNum]: blobUrl }));
-
+    try {
+      const res = await handleAPI(
+        `/books/read/${bookId}?page=${pageNum}&width=1000&height=1000&density=200`,
+        null,
+        "get",
+        "blob"
+      );
+      const blobUrl = URL.createObjectURL(res.data);
+      setImage(blobUrl);
+      setPreloadedImages((prev) => ({ ...prev, [pageNum]: blobUrl }));
+    } catch (error) {
+      console.error("Error fetching content:", error);
+    }
   };
 
   const preloadImages = async (currentPage: number) => {
     if (!book) return;
+    const pagesToPreload = [currentPage - 1, currentPage, currentPage + 1].filter(
+      (page) => page > 0 && page <= book.PageCount
+    );
 
-    const pagesToPreload = [
-      currentPage - 1,
-      currentPage,
-      currentPage + 1,
-    ].filter((page) => page > 0 && page <= book.PageCount);
+    try {
+      const results = await Promise.all(
+        pagesToPreload.map(async (page) => {
+          if (!preloadedImages[page]) {
+            const res = await handleAPI(
+              `/books/read/${bookId}?page=${page}&width=1000&height=1000&density=200`,
+              null,
+              "get",
+              "blob"
+            );
+            const blobUrl = URL.createObjectURL(res.data);
+            return { page, url: blobUrl };
+          }
+          return null;
+        })
+      );
 
-    const promises = pagesToPreload.map(async (page) => {
-      if (!preloadedImages[page]) {
-        const res = await handleAPI(
-          `/books/read/${bookId}?page=${page}&width=1000&height=1000&density=200`,
-          null,
-          "get",
-          "blob"
-        );
-        const blobUrl = URL.createObjectURL(res.data);
-        return { page, url: blobUrl };
-      }
-      return null;
-    });
-
-    const results = await Promise.all(promises);
-    setPreloadedImages((prev) => {
-      const updated = { ...prev };
-      results.forEach((result) => {
-        if (result) updated[result.page] = result.url;
+      setPreloadedImages((prev) => {
+        const updated = { ...prev };
+        results.forEach((result) => {
+          if (result) updated[result.page] = result.url;
+        });
+        return updated;
       });
-      return updated;
-    });
-
+    } catch (error) {
+      console.error("Error preloading images:", error);
+    }
   };
 
   const loadNote = async () => {
@@ -162,12 +166,7 @@ const BookReader = () => {
         return;
       }
 
-      const notePayload = {
-        booksId: bookId,
-        page: pageNum,
-        detail,
-      };
-
+      const notePayload = { booksId: bookId, page: pageNum, detail };
       const res: AxiosResponse<ResponseDTO<Note>> = note
         ? await handleAPI(`notes/update/${note.id}`, notePayload, "put")
         : await handleAPI(`notes/add`, notePayload, "post");

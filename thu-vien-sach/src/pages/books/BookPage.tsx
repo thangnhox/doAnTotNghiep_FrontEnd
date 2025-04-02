@@ -34,14 +34,11 @@ const BookPage = () => {
   const getBooks = async (pageNum: number) => {
     try {
       setLoading(true);
-      const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`books?PageCount&page=1&pageSize=5&sort=Title&order=desc`);
+      const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`books?page=${pageNum}&pageSize=5&sort=Title&order=desc`);
       setBooks(res.data.data);
       setTotal(res.data.total ?? 0);
-      console.log(res.data.data)
-
     } catch (error: any) {
       message.error(error.response?.message || "Error fetching books");
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -50,13 +47,12 @@ const BookPage = () => {
   const performSearch = async (input: string) => {
     try {
       setLoading(true);
-      const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`books/search?title=${input}`);
+      const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`books/search?title=${input}&page=1&pageSize=5`);
       setBooks(res.data.data);
       setTotal(res.data.total ?? 0);
       setPageNum(1);
     } catch (error: any) {
       message.error(error.response?.message || "Error searching books");
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -65,27 +61,27 @@ const BookPage = () => {
   const performFilter = async (filters = selectedFilter) => {
     try {
       setLoading(true);
-      const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(`books/search?minPrice=${filters.minPrice}&maxPrice=${filters.maxPrice}`);
+      const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(
+        `books/search?minPrice=${filters.minPrice}&maxPrice=${filters.maxPrice}&minPage=${filters.minPage}&maxPage=${filters.maxPage}&page=1&pageSize=5`
+      );
       setBooks(res.data.data);
       setTotal(res.data.total ?? 0);
-      console.log(res.data.data)
-
     } catch (error: any) {
       message.error(error.response?.message || "Error fetching books");
-      console.error(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const resetFilters = () => {
-    setSelectedFilter({
+    const defaultFilter = {
       maxPrice: 2500000,
       minPrice: 0,
       maxPage: 1000,
       minPage: 1,
-    });
-    getBooks(1);
+    };
+    setSelectedFilter(defaultFilter);
+    performFilter(defaultFilter);
   };
 
   return isLoading ? (
