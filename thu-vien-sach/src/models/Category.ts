@@ -4,11 +4,11 @@ export default interface Category {
   id: number;
   name: string;
   booklist?: {
-    coverUrl: string;
-    id: number;
-    price: number;
-    title: string;
-    totalPage: number;
+    cover_url: string;
+    BookID: number;
+    Price: number;
+    Title: string;
+    PageCount: number;
   }[];
   books?: number;
 }
