@@ -10,7 +10,7 @@ import {
   Spin,
   Typography,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { handleAPI } from "../../remotes/apiHandle";
 import { useForm } from "antd/es/form/Form";
@@ -35,45 +35,16 @@ const BookReader = () => {
   const [note, setNote] = useState<Note | null>(null);
   const [noteForm] = useForm();
 
-  useEffect(() => {
-    fetchBookDetails();
-    getLastPageRead();
-  }, []);
-
-  useEffect(() => {
-    if (pageNum) getData();
-  }, [pageNum]);
-
-  const getData = async () => {
-    try {
-      setLoading(true);
-      await Promise.all([getContent(pageNum!), updateReadingHistory(pageNum!), loadNote()]);
-      preloadImages(pageNum!);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateReadingHistory = async (pageNum: number) => {
-    try {
-      await handleAPI(`history/update/${bookId}/${pageNum}`);
-    } catch (error) {
-      console.error("Error updating reading history:", error);
-    }
-  };
-
-  const fetchBookDetails = async () => {
+  const fetchBookDetails = useCallback(async () => {
     try {
       const res = await handleAPI(`books/fetch/${bookId}`);
       setBook(res.data.data);
     } catch (error) {
       console.error("Error fetching book details:", error);
     }
-  };
+  }, [bookId]);
 
-  const getLastPageRead = async () => {
+  const getLastPageRead = useCallback(async () => {
     try {
       const res: AxiosResponse<ResponseDTO<BookReadHistory>> =
         await handleAPI(`history/get/${bookId}`);
@@ -82,64 +53,94 @@ const BookReader = () => {
       console.error("Error getting last page read:", error);
       setPage(1);
     }
-  };
+  }, [bookId]);
 
-  const getContent = async (pageNum: number) => {
-    if (preloadedImages[pageNum]) {
-      setImage(preloadedImages[pageNum]);
-      return;
-    }
-    try {
-      const res = await handleAPI(
-        `/books/read/${bookId}?page=${pageNum}&width=1000&height=1000&density=200`,
-        null,
-        "get",
-        "blob"
-      );
-      const blobUrl = URL.createObjectURL(res.data);
-      setImage(blobUrl);
-      setPreloadedImages((prev) => ({ ...prev, [pageNum]: blobUrl }));
-    } catch (error) {
-      console.error("Error fetching content:", error);
-    }
-  };
-
-  const preloadImages = async (currentPage: number) => {
-    if (!book) return;
-    const pagesToPreload = [currentPage - 1, currentPage, currentPage + 1].filter(
-      (page) => page > 0 && page <= book.PageCount
-    );
-
-    try {
-      const results = await Promise.all(
-        pagesToPreload.map(async (page) => {
-          if (!preloadedImages[page]) {
-            const res = await handleAPI(
-              `/books/read/${bookId}?page=${page}&width=1000&height=1000&density=200`,
-              null,
-              "get",
-              "blob"
-            );
-            const blobUrl = URL.createObjectURL(res.data);
-            return { page, url: blobUrl };
-          }
-          return null;
-        })
-      );
-
+  const getContent = useCallback(
+    async (pageNum: number) => {
+      // Use the updater function to check if the page is already preloaded
+      let cachedImage: string | undefined;
       setPreloadedImages((prev) => {
-        const updated = { ...prev };
-        results.forEach((result) => {
-          if (result) updated[result.page] = result.url;
-        });
-        return updated;
+        cachedImage = prev[pageNum];
+        return prev; // Return the current state without modifying it
       });
-    } catch (error) {
-      console.error("Error preloading images:", error);
-    }
-  };
 
-  const loadNote = async () => {
+      if (cachedImage) {
+        setImage(cachedImage); // Use the cached image
+        return;
+      }
+
+      try {
+        const res = await handleAPI(
+          `/books/read/${bookId}?page=${pageNum}&width=1000&height=1000&density=200`,
+          null,
+          "get",
+          "blob"
+        );
+        const blobUrl = URL.createObjectURL(res.data);
+        setImage(blobUrl);
+        setPreloadedImages((prev) => ({ ...prev, [pageNum]: blobUrl }));
+      } catch (error) {
+        console.error("Error fetching content:", error);
+      }
+    },
+    [bookId] // Removed preloadedImages from the dependency array
+  );
+
+  const preloadImages = useCallback(
+    async (currentPage: number) => {
+      if (!book) return;
+
+      const pagesToPreload = [currentPage - 1, currentPage, currentPage + 1].filter(
+        (page) => page > 0 && page <= book.PageCount
+      );
+
+      try {
+        const results = await Promise.all(
+          pagesToPreload.map(async (page) => {
+            // Use the updater function to check if the page is already preloaded
+            let isAlreadyPreloaded = false;
+            setPreloadedImages((prev) => {
+              isAlreadyPreloaded = !!prev[page];
+              return prev; // Return the current state without modifying it
+            });
+
+            if (!isAlreadyPreloaded) {
+              const res = await handleAPI(
+                `/books/read/${bookId}?page=${page}&width=1000&height=1000&density=200`,
+                null,
+                "get",
+                "blob"
+              );
+              const blobUrl = URL.createObjectURL(res.data);
+              return { page, url: blobUrl };
+            }
+            return null;
+          })
+        );
+
+        setPreloadedImages((prev) => {
+          const updated = { ...prev };
+          results.forEach((result) => {
+            if (result) updated[result.page] = result.url;
+          });
+          return updated;
+        });
+      } catch (error) {
+        console.error("Error preloading images:", error);
+      }
+    },
+    [book, bookId] // Removed preloadedImages from the dependency array
+  );
+
+  const updateReadingHistory = useCallback(async (pageNum: number) => {
+    try {
+      await handleAPI(`history/update/${bookId}/${pageNum}`);
+    } catch (error) {
+      console.error("Error updating reading history:", error);
+    }
+  }, [bookId]);
+
+  const loadNote = useCallback(async () => {
     try {
       setNoteLoading(true);
       const res: AxiosResponse<ResponseDTO<Note[]>> = await handleAPI(
@@ -154,9 +155,62 @@ const BookReader = () => {
     } finally {
       setNoteLoading(false);
     }
-  };
+  }, [bookId, pageNum, noteForm]);
 
-  const saveNote = async () => {
+  const getData = useCallback(async () => {
+    try {
+      console.log("Fetching data for page:", pageNum);
+      setLoading(true);
+      await Promise.all([getContent(pageNum!), updateReadingHistory(pageNum!), loadNote()]);
+      preloadImages(pageNum!);
+      console.log("Data fetched successfully for page:", pageNum);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [pageNum, getContent, updateReadingHistory, loadNote, preloadImages]);
+
+  useEffect(() => {
+    fetchBookDetails();
+    getLastPageRead();
+  }, [fetchBookDetails, getLastPageRead]);
+
+  useEffect(() => {
+    if (pageNum) {
+      getData();
+    }
+  }, [pageNum, getData]);
+
+  useEffect(() => {
+    console.log("Page number changed:", pageNum);
+  }, [pageNum]);
+
+  useEffect(() => {
+    console.log("Book details updated:", book);
+  }, [book]);
+
+  useEffect(() => {
+    console.log("Current page image updated:", image);
+  }, [image]);
+
+  useEffect(() => {
+    console.log("Note updated:", note);
+  }, [note]);
+
+  useEffect(() => {
+    console.log("Preloaded images updated:", preloadedImages);
+  }, [preloadedImages]);
+
+  useEffect(() => {
+    console.log("Loading state changed:", isLoading);
+  }, [isLoading]);
+
+  useEffect(() => {
+    console.log("Note loading state changed:", noteLoading);
+  }, [noteLoading]);
+
+  const saveNote = useCallback(async () => {
     try {
       setNoteLoading(true);
       const detail: string = noteForm.getFieldValue("detail").trim();
@@ -179,7 +233,7 @@ const BookReader = () => {
     } finally {
       setNoteLoading(false);
     }
-  };
+  }, [bookId, pageNum, note, noteForm]);
 
   return (
     <div className="container-fulid m-3">

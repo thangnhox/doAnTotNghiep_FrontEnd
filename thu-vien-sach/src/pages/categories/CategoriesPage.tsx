@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Category from "../../models/Category";
 import { AxiosResponse } from "axios";
 import { ResponseDTO } from "../../dtos/ResponseDTO";
 import { handleAPI } from "../../remotes/apiHandle";
-import { Card, Divider, Spin, Typography, Button, List, Pagination } from "antd";
+import { Card, Divider, Spin, Typography, List, Pagination } from "antd";
 import { useNavigate } from "react-router-dom";
 
 interface PageState {

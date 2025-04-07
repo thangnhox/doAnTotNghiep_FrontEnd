@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Author from "../../models/Author";
 import Book from "../../models/book/Book";
@@ -22,11 +22,7 @@ const AuthorDetailPage = () => {
     isLoading: false,
   });
 
-  useEffect(() => {
-    getAuthor();
-  }, []);
-
-  const getAuthor = async () => {
+  const getAuthor = useCallback(async () => {
     try {
       setPageState((prev) => ({
         ...prev,
@@ -54,7 +50,11 @@ const AuthorDetailPage = () => {
         isLoading: false,
       }));
     }
-  };
+  }, [authorId]);
+
+  useEffect(() => {
+    getAuthor();
+  }, [getAuthor]);
 
   return pageState.isLoading ? (
     <Spin />

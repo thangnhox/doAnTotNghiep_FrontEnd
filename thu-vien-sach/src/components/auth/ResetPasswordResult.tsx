@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, Modal, Result, Spin, Typography } from 'antd';
+import { Button, Card, Form, Input, Modal, Spin, Typography } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { handleAPI } from '../../remotes/apiHandle';

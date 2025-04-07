@@ -8,7 +8,7 @@ interface Props {
 }
 
 const BookCard = (props: Props) => {
-  const { Title, BookID, Price, cover_url, isRecommend, PageCount } =
+  const { Title, BookID, Price, cover_url, PageCount } =
     props.book;
   const navigate = useNavigate();
 

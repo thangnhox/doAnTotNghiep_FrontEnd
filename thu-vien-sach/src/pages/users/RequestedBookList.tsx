@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RequestedBook } from "../../models/RequestedBook";
-import { Button, Card, Flex, Form, Input, Modal, Table, TableProps } from "antd";
+import { Button, Card, Form, Input, Modal, Table, TableProps } from "antd";
 import { handleAPI } from "../../remotes/apiHandle";
 import { useForm } from "antd/es/form/Form";
 
@@ -34,28 +34,24 @@ const RequestedBookList = () => {
   }, [])
 
   const renderStatus = (value: number) => {
-    switch (value) {
-      case -1:
-        return "Từ chối"
-      case 0:
-        return "Đang chờ"
-      default:
-        return "Thành công"
-    }
-  }
+    const statusMap: { [key: string]: string } = {
+      "-1": "Từ chối",
+      "0": "Đang chờ"
+    };
+    return statusMap[String(value)] || "Thành công";
+  };
 
   const getBookRequested = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await handleAPI(`books/requestedBooks`);
-      setRequestedBooks(res.data.data)
-    } catch (error: any) {
-      console.log(error)
+      setRequestedBooks(res.data.data || []);
+    } catch (error) {
+      console.error("Failed to fetch requested books:", error);
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false)
-    }
-  }
+  };
 
   const performRequest = async () => {
     try {
@@ -63,17 +59,16 @@ const RequestedBookList = () => {
       const requestBook = requestBookForm.getFieldsValue();
       const res = await handleAPI(`books/makeBookRequest`, requestBook, 'post');
       if (res.status === 201) {
-        getBookRequested()
+        getBookRequested();
       }
-    } catch (error: any) {
-      console.log(error)
-    }
-    finally {
+    } catch (error) {
+      console.error("Failed to perform book request:", error);
+    } finally {
       setModalLoading(false);
       setOpenModal(false);
-      requestBookForm.resetFields()
+      requestBookForm.resetFields();
     }
-  }
+  };
 
   return <>
     <Card extra={
@@ -81,56 +76,30 @@ const RequestedBookList = () => {
         <Button type="primary" onClick={() => setOpenModal(true)} >Yêu cầu sách</Button>
       </div >}
     >
-      <Table columns={tableColumn} dataSource={requestedBooks} />
+      <Table 
+        columns={tableColumn} 
+        dataSource={requestedBooks} 
+        loading={isLoading} 
+      />
     </Card >
     <Modal title={"Yêu cầu thêm sách"} open={isOpenModal} closable={false} footer={<div className="d-flex flex-row justify-content-end gap-3 " >
       <Button type="primary" onClick={() => requestBookForm.submit()} loading={isModalLoading} >Yêu cầu</Button>
-      <Button type="primary" loading={isModalLoading} onClick={() => {
+      <Button onClick={() => {
         setOpenModal(false);
-        requestBookForm.resetFields()
+        requestBookForm.resetFields();
       }} danger  >Đóng</Button>
     </div>} >
       <Form form={requestBookForm} layout="vertical" onFinish={performRequest} >
-        <Form.Item label="Tiêu đề" name="title" rules={
-          [
-            {
-              required: true,
-              message: "Vui lòng nhập tiêu đề"
-            },
-            {
-              min: 2,
-              message: "Tiêu đề phải có ít nhất 2 ký tự"
-            },
-            {
-
-            },
-            {
-              whitespace: false,
-              message: "Tiêu đề không được chứa khoảng trắng"
-            }
-          ]
-        } >
+        <Form.Item label="Tiêu đề" name="title" rules={[
+          { required: true, message: "Vui lòng nhập tiêu đề" },
+          { min: 2, message: "Tiêu đề phải có ít nhất 2 ký tự" }
+        ]}>
           <Input />
         </Form.Item>
-        <Form.Item label="Mô tả" name="description" required rules={
-          [
-            {
-              required: true,
-              message: "Vui lòng nhập mô tả"
-            },
-            {
-              min: 10,
-              message: "Mô tả phải có ít nhất 2 ký tự"
-            },
-            {
-
-            },
-            {
-              whitespace: false,
-              message: "Mô tả không được chứa khoảng trắng"
-            }
-          ]
-        }>
+        <Form.Item label="Mô tả" name="description" rules={[
+          { required: true, message: "Vui lòng nhập mô tả" },
+          { min: 10, message: "Mô tả phải có ít nhất 10 ký tự" }
+        ]}>
           <Input.TextArea />
         </Form.Item >
       </Form>

@@ -12,7 +12,7 @@ import AuthorsPage from "../pages/authors/AuthorsPage";
 import BookReader from "../pages/books/BookReader";
 import UserInformationPage from "../pages/users/UserInformationPage";
 import { useDispatch, useSelector } from "react-redux";
-import { AddAuth, AuthState, authState } from "../redux/authSlice";
+import { AddAuth, authState } from "../redux/authSlice";
 import SubscribePage from "../pages/memberships/SubscribePage";
 import ConfirmOrder from "../pages/payment/ConfirmOrder";
 import PaymentResult from "../pages/payment/PaymentResult";
@@ -21,13 +21,12 @@ import CategoriesPage from "../pages/categories/CategoriesPage";
 import AuthorDetailPage from "../pages/authors/AuthorDetailPage";
 import axios, { AxiosResponse } from "axios";
 import { User } from "firebase/auth";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { AppConstants } from "../appConstants";
 import { ResponseDTO } from "../dtos/ResponseDTO";
 import { UserMembership } from "../models/UserMembership";
 import { validateToken } from "../utils/jwtUtil";
 import ConfirmSubscriptionOrder from "../pages/payment/ConfirmSubscriptionOrder";
-import ResetPasswordPage from "../components/auth/ResetPasswordPage";
 import ResetPasswordResult from "../components/auth/ResetPasswordResult";
 
 const MainLayout = () => {
@@ -44,11 +43,7 @@ const MainRouter = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    checkLogin();
-  }, []);
-
-  const checkLogin = async () => {
+  const checkLogin = useCallback(async () => {
     try {
       const res = localStorage.getItem(AppConstants.token);
       if (!res) {
@@ -84,7 +79,11 @@ const MainRouter = () => {
     } catch (e: any) {
       console.log(e);
     }
-  };
+  }, [dispatch]);
+
+  useEffect(() => {
+    checkLogin();
+  }, [checkLogin]);
 
   return (
     <BrowserRouter>

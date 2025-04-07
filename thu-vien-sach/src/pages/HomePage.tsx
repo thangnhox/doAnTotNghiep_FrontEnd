@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { handleAPI } from "../remotes/apiHandle";
 import { ResponseDTO } from "../dtos/ResponseDTO";
 import Book from "../models/book/Book";
@@ -24,44 +24,44 @@ const HomePage = () => {
   const [authors, setAuthors] = useState<Author[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const getBooks = async () => {
+  const getBooks = useCallback(async () => {
     const res: AxiosResponse<ResponseDTO<Book[]>> = await handleAPI(
       `books?page=1&pageSize=10`
     );
     setBooks(res.data.data);
-  };
-
-  const getCategories = async () => {
+  }, []);
+  
+  const getCategories = useCallback(async () => {
     const res: AxiosResponse<ResponseDTO<Category[]>> = await handleAPI(
       `categories?page=1&pageSize=10`
     );
     setCategories(res.data.data);
-  };
-
-  const getAuthors = async () => {
+  }, []);
+  
+  const getAuthors = useCallback(async () => {
     const res: AxiosResponse<ResponseDTO<Author[]>> = await handleAPI(
       `authors?page=1&pageSize=10`
     );
     setAuthors(res.data.data);
-  };
-
-  const getData = async () => {
+  }, []);
+  
+  const getData = useCallback(async () => {
     setLoading(true);
     try {
-      getBooks();
-      getCategories();
-      getAuthors();
+      await getBooks();
+      await getCategories();
+      await getAuthors();
     } catch (error: any) {
       console.log(error);
-      message.error(error.response.message);
+      message.error(error.response?.message || "Error fetching data");
     } finally {
       setLoading(false);
     }
-  };
+  }, [getBooks, getCategories, getAuthors]);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
   return isLoading ? (
     <Spin />

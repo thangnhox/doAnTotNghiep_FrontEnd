@@ -1,8 +1,7 @@
-import { Card, List, Spin } from 'antd'
-import React, { useEffect, useState } from 'react'
+import { List } from 'antd'
+import { useEffect, useState } from 'react'
 import Book from '../../models/book/Book'
 import { handleAPI } from '../../remotes/apiHandle'
-import { get } from 'http'
 import BookItem from '../../components/book/BookItem'
 
 const LikedBook = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Category from "../../models/Category";
 import { AxiosResponse } from "axios";
@@ -12,7 +12,7 @@ const CategoryDetailPage = () => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const getCategory = async () => {
+  const getCategory = useCallback(async () => {
     try {
       setLoading(true);
       const res: AxiosResponse<ResponseDTO<Category>> = await handleAPI(
@@ -25,11 +25,11 @@ const CategoryDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [categoryId]);
 
   useEffect(() => {
     getCategory();
-  }, []);
+  }, [getCategory]);
 
   if (isLoading) {
     return <Spin />;

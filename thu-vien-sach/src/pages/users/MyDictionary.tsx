@@ -1,5 +1,4 @@
-import { Table, TableProps } from "antd";
-import React from "react";
+import { Table } from "antd";
 
 const MyDictionary = () => {
   return <Table></Table>;

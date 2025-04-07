@@ -1,4 +1,4 @@
-import { isExpired, decodeToken } from "react-jwt";
+import { isExpired } from "react-jwt";
 
 export const validateToken = (token?: string): boolean => {
   if (token) {

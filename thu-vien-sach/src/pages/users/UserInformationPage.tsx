@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import User from "../../models/User";
 import { Card, Divider, Menu, MenuProps } from "antd";
 import UserInfo from "../../components/user/UserInfo";
