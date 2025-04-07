@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { Button, Card, Divider, Input, message, Spin, Typography } from "antd";
 import { useState } from "react";
 import { AxiosResponse } from "axios";
 import { handleAPI } from "../../remotes/apiHandle";
 import { Discount } from "../../models/Discount";
 import { ResponseDTO } from "../../dtos/ResponseDTO";
-import { useParams } from 'react-router-dom';
-import Membership from '../../models/Membership';
+import { useNavigate, useParams } from 'react-router-dom';
+import Membership, { MembershipRankDescription } from '../../models/Membership';
 
 const ConfirmSubscriptionOrder = () => {
     const { membershipId } = useParams()
@@ -14,28 +14,28 @@ const ConfirmSubscriptionOrder = () => {
     const [isLoading, setLoading] = useState<boolean>(false);
     const [discount, setDiscount] = useState<Discount | null>(null);
     const [membership, setMembership] = useState<Membership | null>(null);
+    const navigate = useNavigate();
 
+    const getMembershipInfo = useCallback(
+        async () => {
+            try {
+                setLoading(true);
+                const res: AxiosResponse<ResponseDTO<Membership>> = await handleAPI(
+                    `membership/fetch/${membershipId}`
+                );
+                setMembership(res.data.data);
+            } catch (error: any) {
+                console.log(error);
+    
+            } finally {
+                setLoading(false);
+            }
+        }, [membershipId]
+    )
 
     useEffect(() => {
         getMembershipInfo();
-    }, [])
-
-    const getMembershipInfo = async () => {
-        try {
-            setLoading(true);
-            const res: AxiosResponse<ResponseDTO<Membership>> = await handleAPI(
-                `membership/fetch/${membershipId}`
-            );
-            setMembership(res.data.data);
-            console.log("Membership Rank")
-            console.log(res.data.data)
-        } catch (error: any) {
-            console.log(error);
-
-        } finally {
-            setLoading(false);
-        }
-    }
+    }, [getMembershipInfo])
 
     const renderMembershipInfo = (membership: Membership | null) => {
         if (!membership) return null;
@@ -47,7 +47,7 @@ const ConfirmSubscriptionOrder = () => {
                 </div>
                 <div className="d-flex flex-row justify-content-between align-items-center w-100">
                     <Text>Chức năng:</Text>
-                    <Text>{renderRankContent(membership.rank)}</Text>
+                    <Text>{MembershipRankDescription(membership.rank)}</Text>
                 </div>
                 <div className="d-flex flex-row justify-content-between align-items-center w-100">
                     <Text>Giá:</Text>
@@ -56,17 +56,6 @@ const ConfirmSubscriptionOrder = () => {
 
             </div>
         )
-    }
-
-    const renderRankContent = (rank: number) => {
-        switch (rank) {
-            case 1:
-                return "Read"
-            case 2:
-                return "Note/Tag"
-            case 3:
-                return "Read + Note/Tag"
-        }
     }
 
     const applyDiscount = async () => {
@@ -105,9 +94,18 @@ const ConfirmSubscriptionOrder = () => {
             );
             if (orderRes.status === 200) {
                 console.log(orderRes)
-                window.location.href = orderRes.data.data.PayUrl;
+                if (orderRes.data.data && orderRes.data.data.PayUrl) {
+                    window.location.href = orderRes.data.data.PayUrl;
+                } else {
+                    message.success(orderRes.data.message);
+                    setTimeout(() => navigate("/"), 1000);
+                }
             }
         } catch (error: any) {
+            if (error.response.status === 403) {
+                message.error(error.response.data.message);
+                setTimeout(() => navigate("/membership/subscribe/"), 5000);
+            }
             console.log(error);
         } finally {
             setLoading(false);

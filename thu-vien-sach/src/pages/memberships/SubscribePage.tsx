@@ -1,13 +1,13 @@
-import { Button, Card, Divider, Modal, Spin, Typography } from "antd";
-import React, { useEffect, useState } from "react";
-import Membership from "../../models/Membership";
+import { Button, Card, Divider, Spin, Typography } from "antd";
+import { useEffect, useState } from "react";
+import Membership, { MembershipAllowNew } from "../../models/Membership";
 import { AxiosResponse } from "axios";
 import { ResponseDTO } from "../../dtos/ResponseDTO";
 import { handleAPI } from "../../remotes/apiHandle";
 import { useNavigate } from "react-router-dom";
 
 const SubscribePage = () => {
-  const { Title, Text } = Typography;
+  const { Text } = Typography;
   const [isLoading, setLoading] = useState<boolean>(false);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const navigate = useNavigate();
@@ -50,6 +50,7 @@ const SubscribePage = () => {
             <Button
               className="mt-3"
               type="primary"
+              disabled={(item.allowNew & MembershipAllowNew.NEW) === 0}
               onClick={() => navigate(`/membership/subscribe/${item.id}`)}
             >
               Đăng ký
