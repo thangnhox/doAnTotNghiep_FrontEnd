@@ -43,7 +43,7 @@ const HeaderComponent = () => {
   return (
     <Header className="d-flex flex-row justify-content-between align-items-center bg-white shadow-sm rounded">
       <Image
-        src="../images/books.png"
+        src="/images/books.png"
         width={60}
         preview={false}
         onClick={() => navigate("/")}

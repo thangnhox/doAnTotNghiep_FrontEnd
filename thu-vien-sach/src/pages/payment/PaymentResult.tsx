@@ -1,6 +1,5 @@
 import { Button, Result } from "antd";
-import React from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const PaymentResult = () => {
   const resultCode = new URLSearchParams(window.location.search).get(
