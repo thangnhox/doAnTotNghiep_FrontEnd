@@ -44,6 +44,17 @@ const BookPage = () => {
     publisherName: "",
   });
 
+  const [pendingFilter, setPendingFilter] = useState<FilterState>(selectedFilter);
+
+  const applyPendingFilter = () => {
+    setSelectedFilter(pendingFilter);
+    performFilter(pendingFilter, filterMode, pageNum);
+  };
+
+  const handlePendingInputChange = (name: keyof FilterState, value: number | undefined) => {
+    setPendingFilter((prev) => ({ ...prev, [name]: value }));
+  };
+
   const performFilter = useCallback(
     async (filters: FilterState, curMode: boolean, page: number) => {
       console.log(filters);
@@ -101,7 +112,7 @@ const BookPage = () => {
         setBooks(res.data.data);
         setTotal(res.data.total ?? 0);
 
-        if (!filterMode) {
+        if (!curMode) {
           setPageNum(1); // Reset page to 1 after filtering
           setFilterMode(true);
         }
@@ -115,7 +126,7 @@ const BookPage = () => {
         setLoading(false);
       }
     },
-    [filterData, filterMode]
+    [filterData]
   );
 
   useEffect(() => {
@@ -176,10 +187,6 @@ const BookPage = () => {
     performFilter(defaultFilter, filterMode, pageNum);
   };
 
-  const handleInputChange = (name: keyof FilterState, value: number | undefined) => {
-    setSelectedFilter((prev) => ({ ...prev, [name]: value }));
-  };
-
   if (isLoading) {
     return (<Spin />);
   }
@@ -193,8 +200,8 @@ const BookPage = () => {
           <InputNumber
             id="minPrice"
             style={{ width: 150 }}
-            value={selectedFilter.minPrice}
-            onChange={(value) => handleInputChange("minPrice", value ? value : filterData.minPrice)}
+            value={pendingFilter.minPrice}
+            onChange={(value) => handlePendingInputChange("minPrice", value ? value : filterData.minPrice)}
             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             parser={(value) => Number(value!.replace(/,/g, ""))}
           />
@@ -202,8 +209,8 @@ const BookPage = () => {
           <InputNumber
             id="maxPrice"
             style={{ width: 150 }}
-            value={selectedFilter.maxPrice}
-            onChange={(value) => handleInputChange("maxPrice", value ? value : filterData.maxPrice)}
+            value={pendingFilter.maxPrice}
+            onChange={(value) => handlePendingInputChange("maxPrice", value ? value : filterData.maxPrice)}
             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             parser={(value) => Number(value!.replace(/,/g, ""))}
           />
@@ -211,22 +218,22 @@ const BookPage = () => {
           <InputNumber
             id="minPage"
             style={{ width: 100 }}
-            value={selectedFilter.minPage}
-            onChange={(value) => handleInputChange("minPage", value ? value : filterData.minPage)}
+            value={pendingFilter.minPage}
+            onChange={(value) => handlePendingInputChange("minPage", value ? value : filterData.minPage)}
           />
           <label htmlFor="maxPage">đến:</label>
           <InputNumber
             id="maxPage"
             style={{ width: 100 }}
-            value={selectedFilter.maxPage}
-            onChange={(value) => handleInputChange("maxPage", value ? value : filterData.maxPage)}
+            value={pendingFilter.maxPage}
+            onChange={(value) => handlePendingInputChange("maxPage", value ? value : filterData.maxPage)}
           />
           <input
             type="checkbox"
             id="enablePagePrice"
-            checked={selectedFilter.enablePagePrice || false}
+            checked={pendingFilter.enablePagePrice || false}
             onChange={(e) =>
-              setSelectedFilter((prev) => ({ ...prev, enablePagePrice: e.target.checked }))
+              setPendingFilter((prev) => ({ ...prev, enablePagePrice: e.target.checked }))
             }
           />
           <label htmlFor="enablePagePrice">Áp dụng hàng này</label>
@@ -236,12 +243,12 @@ const BookPage = () => {
           <Input
             id="bookName"
             style={{ width: 300 }}
-            value={selectedFilter.bookName || ""}
+            value={pendingFilter.bookName || ""}
             onChange={(e) => {
               const value = e.target.value;
               // Allow only letters, numbers, and spaces
               if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-                setSelectedFilter((prev) => ({ ...prev, bookName: value }));
+                setPendingFilter((prev) => ({ ...prev, bookName: value }));
               } else {
                 message.error("Tên sách không được chứa ký tự đặc biệt!");
               }
@@ -252,12 +259,12 @@ const BookPage = () => {
           <Input
             id="category"
             style={{ width: 300 }}
-            value={selectedFilter.category || ""}
+            value={pendingFilter.category || ""}
             onChange={(e) => {
               const value = e.target.value;
               // Allow only letters, numbers, and spaces
               if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-                setSelectedFilter((prev) => ({ ...prev, category: value }));
+                setPendingFilter((prev) => ({ ...prev, category: value }));
               } else {
                 message.error("Thể loại không được chứa ký tự đặc biệt!");
               }
@@ -270,12 +277,12 @@ const BookPage = () => {
           <Input
             id="authorName"
             style={{ width: 300 }}
-            value={selectedFilter.authorName || ""}
+            value={pendingFilter.authorName || ""}
             onChange={(e) => {
               const value = e.target.value;
               // Allow only letters, numbers, and spaces
               if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-                setSelectedFilter((prev) => ({ ...prev, authorName: value }));
+                setPendingFilter((prev) => ({ ...prev, authorName: value }));
               } else {
                 message.error("Tên tác giả không được chứa ký tự đặc biệt!");
               }
@@ -286,12 +293,12 @@ const BookPage = () => {
           <Input
             id="publisherName"
             style={{ width: 300 }}
-            value={selectedFilter.publisherName || ""}
+            value={pendingFilter.publisherName || ""}
             onChange={(e) => {
               const value = e.target.value;
               // Allow only letters, numbers, and spaces
               if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-                setSelectedFilter((prev) => ({ ...prev, publisherName: value }));
+                setPendingFilter((prev) => ({ ...prev, publisherName: value }));
               } else {
                 message.error("Nhà xuất bản không được chứa ký tự đặc biệt!");
               }
@@ -303,14 +310,14 @@ const BookPage = () => {
           <input
             type="checkbox"
             id="exact"
-            checked={selectedFilter.exact || false}
+            checked={pendingFilter.exact || false}
             onChange={(e) =>
-              setSelectedFilter((prev) => ({ ...prev, exact: e.target.checked }))
+              setPendingFilter((prev) => ({ ...prev, exact: e.target.checked }))
             }
           />
           <label htmlFor="exact">Tìm chính xác</label>
         </div>
-        <Button type="primary" onClick={() => performFilter(selectedFilter, filterMode, pageNum)}>
+        <Button type="primary" onClick={applyPendingFilter}>
           Áp dụng Lọc
         </Button>
         <Button className="ms-2" onClick={resetFilters}>
