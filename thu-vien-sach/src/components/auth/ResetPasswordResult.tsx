@@ -32,7 +32,7 @@ const ResetPasswordResult = () => {
                 setOpenModal(true)
             }
         } catch (error) {
-            console.log(error)
+            console.error(error)
         } finally {
             setLoading(false)
         }

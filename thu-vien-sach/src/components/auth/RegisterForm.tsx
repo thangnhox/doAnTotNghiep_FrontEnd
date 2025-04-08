@@ -47,7 +47,7 @@ const RegisterForm = () => {
           setOpenModal(true)
         }
       } catch (error: any) {
-        console.log(error)
+        console.error(error)
         message.error(error.response?.data)
       } finally {
         setLoading(false)

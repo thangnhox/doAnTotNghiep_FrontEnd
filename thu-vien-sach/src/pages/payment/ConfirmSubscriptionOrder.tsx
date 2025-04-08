@@ -25,7 +25,7 @@ const ConfirmSubscriptionOrder = () => {
                 );
                 setMembership(res.data.data);
             } catch (error: any) {
-                console.log(error);
+                console.error(error);
     
             } finally {
                 setLoading(false);
@@ -65,7 +65,6 @@ const ConfirmSubscriptionOrder = () => {
             const res: AxiosResponse<ResponseDTO<Discount[]>> = await handleAPI(
                 `discount/fetch/${values}`
             );
-            console.log(res.data.data)
             if (res.data.data[0].status === 0) {
                 message.error("Mã giảm giá không tồn tại hoặc đã hết hạn");
                 return;
@@ -74,7 +73,7 @@ const ConfirmSubscriptionOrder = () => {
                 setDiscount(res.data.data[0]);
             }
         } catch (error: any) {
-            console.log(error);
+            console.error(error);
         } finally {
             setLoading(false);
         }
@@ -93,7 +92,6 @@ const ConfirmSubscriptionOrder = () => {
                 "post"
             );
             if (orderRes.status === 200) {
-                console.log(orderRes)
                 if (orderRes.data.data && orderRes.data.data.PayUrl) {
                     window.location.href = orderRes.data.data.PayUrl;
                 } else {
@@ -106,7 +104,7 @@ const ConfirmSubscriptionOrder = () => {
                 message.error(error.response.data.message);
                 setTimeout(() => navigate("/membership/subscribe/"), 5000);
             }
-            console.log(error);
+            console.error(error);
         } finally {
             setLoading(false);
         }

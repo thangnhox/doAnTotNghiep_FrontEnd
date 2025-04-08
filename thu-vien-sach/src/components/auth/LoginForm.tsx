@@ -80,7 +80,7 @@ const LoginForm = () => {
       }
     } catch (error: any) {
       message.error("Email hoặc mật khẩu không đúng");
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,7 @@ const LoginForm = () => {
         message.success("Đăng nhập thành công");
       }
     } catch (e: any) {
-      console.log(e);
+      console.error(e);
     } finally {
       setLoading(false);
     }

@@ -77,7 +77,7 @@ const MainRouter = () => {
         })
       );
     } catch (e: any) {
-      console.log(e);
+      console.error(e);
     }
   }, [dispatch]);
 

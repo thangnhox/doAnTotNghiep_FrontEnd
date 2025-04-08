@@ -41,9 +41,8 @@ const AuthorDetailPage = () => {
         })),
         author: res.data.data.author,
       }));
-      console.log(res.data.data.books);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setPageState((prev) => ({
         ...prev,

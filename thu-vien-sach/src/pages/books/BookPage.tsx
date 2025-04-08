@@ -57,7 +57,6 @@ const BookPage = () => {
 
   const performFilter = useCallback(
     async (filters: FilterState, curMode: boolean, page: number) => {
-      console.log(filters);
       try {
         setLoading(true);
 

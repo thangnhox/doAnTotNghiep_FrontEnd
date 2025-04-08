@@ -21,7 +21,7 @@ const LikedBook = () => {
                 setLikedBooks(res.data.data.likedBooks)
             }
         } catch (error: any) {
-            console.log(error)
+            console.error(error)
         }
         finally {
             setLoading(false)

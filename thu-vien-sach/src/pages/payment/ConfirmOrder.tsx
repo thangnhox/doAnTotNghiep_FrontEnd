@@ -28,11 +28,10 @@ const ConfirmOrder = () => {
         "post"
       );
       if (orderRes.status === 200) {
-        console.log(orderRes)
         window.location.href = orderRes.data.data.PayUrl;
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -45,7 +44,6 @@ const ConfirmOrder = () => {
       const res: AxiosResponse<ResponseDTO<Discount[]>> = await handleAPI(
         `discount/fetch/${values}`
       );
-      console.log(res.data.data)
       if (res.data.data[0].status === 0) {
         message.error("Mã giảm giá không tồn tại hoặc đã hết hạn");
         return;
@@ -54,7 +52,7 @@ const ConfirmOrder = () => {
         setDiscount(res.data.data[0]);
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

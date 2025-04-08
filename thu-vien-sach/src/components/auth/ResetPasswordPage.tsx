@@ -18,7 +18,7 @@ const ResetPasswordForm = () => {
                 setModalOpen(true)
             }
         } catch (error) {
-            console.log(error)
+            console.error(error)
             setMessage("Đã xảy ra lỗi. Vui lòng thử lại sau")
             setModalOpen(true)
         }

@@ -54,7 +54,7 @@ const AuthorsPage = () => {
         authors: res.data.data,
       }));
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setPageState((prev) => ({
         ...prev,

@@ -21,7 +21,7 @@ const CategoryDetailPage = () => {
 
       setCategory(res.data.data);
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

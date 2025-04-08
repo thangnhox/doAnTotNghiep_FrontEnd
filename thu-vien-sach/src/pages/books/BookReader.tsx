@@ -31,7 +31,7 @@ const BookReader = () => {
   const [pageNum, setPage] = useState<number | undefined>(undefined);
   const [book, setBook] = useState<Book | null>(null);
   const [image, setImage] = useState<string | null>(null);
-  const [preloadedImages, setPreloadedImages] = useState<Record<number, string>>({});
+  const [, setPreloadedImages] = useState<Record<number, string>>({});
   const [note, setNote] = useState<Note | null>(null);
   const [noteForm] = useForm();
 
@@ -159,11 +159,9 @@ const BookReader = () => {
 
   const getData = useCallback(async () => {
     try {
-      console.log("Fetching data for page:", pageNum);
       setLoading(true);
       await Promise.all([getContent(pageNum!), updateReadingHistory(pageNum!), loadNote()]);
       preloadImages(pageNum!);
-      console.log("Data fetched successfully for page:", pageNum);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -181,34 +179,6 @@ const BookReader = () => {
       getData();
     }
   }, [pageNum, getData]);
-
-  useEffect(() => {
-    console.log("Page number changed:", pageNum);
-  }, [pageNum]);
-
-  useEffect(() => {
-    console.log("Book details updated:", book);
-  }, [book]);
-
-  useEffect(() => {
-    console.log("Current page image updated:", image);
-  }, [image]);
-
-  useEffect(() => {
-    console.log("Note updated:", note);
-  }, [note]);
-
-  useEffect(() => {
-    console.log("Preloaded images updated:", preloadedImages);
-  }, [preloadedImages]);
-
-  useEffect(() => {
-    console.log("Loading state changed:", isLoading);
-  }, [isLoading]);
-
-  useEffect(() => {
-    console.log("Note loading state changed:", noteLoading);
-  }, [noteLoading]);
 
   const saveNote = useCallback(async () => {
     try {

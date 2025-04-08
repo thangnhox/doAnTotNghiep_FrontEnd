@@ -17,9 +17,8 @@ const PurchasedBookList = () => {
       setLoading(true);
       const res = await handleAPI(`order/boughtBooks`);
       setPurchasedBook(res.data.data);
-      console.log(res.data);
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

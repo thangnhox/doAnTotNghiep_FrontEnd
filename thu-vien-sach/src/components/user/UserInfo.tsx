@@ -54,7 +54,7 @@ const UserInfo = (props: Props) => {
         window.location.reload();
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
       message.error(`Đã xảy ra lỗi! Vui lòng thử lại sau`);
     } finally {
       setFormLoading(false);

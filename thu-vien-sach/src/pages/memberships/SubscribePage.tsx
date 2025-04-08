@@ -23,9 +23,8 @@ const SubscribePage = () => {
         `membership`
       );
       setMemberships(res.data.data);
-      console.log(res.data.data);
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

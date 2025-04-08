@@ -25,9 +25,8 @@ const ReadBookList = () => {
       setLoading(true);
       const res = await handleAPI(`history`);
       setReadBooks(res.data.data);
-      console.log(res.data);
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

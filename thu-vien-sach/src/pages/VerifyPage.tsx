@@ -28,7 +28,7 @@ const VerifyPage = () => {
       }
     } catch (error: any) {
       message.error(error.response?.data?.message || 'Đã xảy ra lỗi');
-      console.log(error);
+      console.error(error);
     }
   }, [token, dispatch, navigate]); // Dependencies: token, dispatch, navigate
 

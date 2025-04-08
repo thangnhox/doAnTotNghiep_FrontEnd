@@ -52,7 +52,7 @@ const HomePage = () => {
       await getCategories();
       await getAuthors();
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
       message.error(error.response?.message || "Error fetching data");
     } finally {
       setLoading(false);

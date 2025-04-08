@@ -20,7 +20,6 @@ const HeaderComponent = () => {
 
 
   const handleSearch = async (title: string) => {
-    console.log("Searching");
     setLoading(true)
     if (!title.trim()) {
       return;
@@ -31,7 +30,7 @@ const HeaderComponent = () => {
       );
       setSearchedBooksSet(res.data.data);
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
     finally {
       setLoading(false)
